@@ -1,0 +1,747 @@
+/* ============ TOKENS ============ */
+:root{
+  color-scheme:light;      /* сайт всегда светлый — тёмная тема не включается */
+  --ground:#F6F1EF;        /* ереванский туф, светлая пыль */
+  --surface:#FFFFFF;
+  --surface-2:#FBF7F5;
+  --ink:#221816;
+  --ink-2:#5E4E4A;
+  --ink-3:#7A6862;          /* 4.71:1 на фоне — AA для мелкого текста */
+  --line:#E2D5D0;           /* декоративные рамки */
+  --line-strong:#9C857C;    /* границы полей ввода, 3.26:1 — AA для элементов */
+  --accent:#F15808;         /* бренд: иконки, крупные цифры, заливки */
+  --accent-text:#B83E04;    /* мелкий акцентный текст, 5.03:1 */
+  --accent-btn:#C34405;     /* фон кнопки, белый текст 5.06:1 */
+  --accent-ink:#A83703;     /* наведение */
+  --accent-soft:#FCEBE0;
+  --deep:#2A1D19;
+  --deep-ink:#F3E9E5;
+  --on-deep:#E8DCD7;        /* текст и ссылки в подвале, 12.15:1 */
+  --on-deep-2:#C7B2AB;      /* описание в подвале, 8.06:1 */
+  --on-deep-3:#A9938C;      /* заголовки колонок, 5.62:1 */
+  --on-deep-4:#9C867F;      /* копирайт, 4.76:1 */
+  /* Первый экран на телефоне: текст на тёмном под фотографией.
+     Контраст посчитан к --deep, цифры проверяет audit.py. */
+  --photo-eyebrow:#F7BFA0;  /* надзаголовок, 10.03:1 */
+  --photo-title:#FFF7F3;    /* заголовок и основной текст, 15.41:1 */
+  --photo-accent:#FF8A45;   /* акцент в заголовке и ссылка, 6.97:1 */
+  --photo-accent-2:#FFB184; /* та же ссылка при наведении, 9.32:1 */
+  --photo-btn:#FF7433;      /* заливка кнопки */
+  --photo-btn-ink:#1C1310;  /* текст на этой кнопке, 6.78:1 */
+  --stage-1:#F3ECE8;        /* фон первого экрана: три остановки градиента */
+  --stage-2:#EFE5E0;
+  --stage-3:#E9DCD5;
+  --stage-4:#8C6F65;        /* пол под ногами команды: переход от светлого к --deep */
+  --focus:#F15808;
+  --radius:14px;
+  --maxw:1140px;
+}
+/* ============ BASE ============ */
+/* обход меню: видна только при переходе с клавиатуры */
+.skip{position:absolute;left:-9999px;top:0;z-index:100;background:var(--accent-btn);color:#fff;
+  padding:12px 20px;border-radius:0 0 10px 0;text-decoration:none;font-weight:600}
+.skip:focus{left:0}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Golos Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+h1,h2,h3{font-family:Literata,Georgia,"Times New Roman",serif;font-weight:600;text-wrap:balance;margin:0;overflow-wrap:break-word}
+h1{font-size:clamp(2.1rem,1.2rem + 3.4vw,3.75rem);line-height:1.06;letter-spacing:-.015em}
+h2{font-size:clamp(1.55rem,1.1rem + 1.6vw,2.3rem);line-height:1.18;letter-spacing:-.01em}
+h3{font-size:1.075rem;line-height:1.35;font-weight:600}
+p{margin:0}
+ul{margin:0;padding:0;list-style:none}
+strong{font-weight:600}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+/* Мелкие прописные подписи — нижний предел .78rem (12,5 px).
+   Меньше на телефоне уже не читается: буквы прописные, разрядка большая. */
+.eyebrow{
+  font-size:.78rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-text);display:flex;align-items:center;gap:.6rem;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line);max-width:96px}
+.lede{font-size:1.075rem;color:var(--ink-2);max-width:62ch}
+.num{color:var(--accent-text);font-variant-numeric:tabular-nums}
+
+/* ============ ICON SYSTEM (единый размер 20px, цвет #F15808) ============ */
+.ic{width:20px;height:20px;flex:none;stroke:var(--accent);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start}
+.li .ic{margin-top:.2em}
+.list{display:grid;gap:.7rem}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  height:52px;padding:0 26px;border-radius:999px;border:1px solid transparent;
+  font-family:inherit;font-size:.95rem;font-weight:600;letter-spacing:.01em;
+  text-decoration:none;cursor:pointer;transition:transform .15s ease,background .15s ease,border-color .15s ease;
+}
+.btn-primary{background:var(--accent-btn);color:#fff;border-color:var(--accent-btn)}
+.btn-primary:hover{transform:translateY(-1px);background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+.btn-ghost:hover{border-color:var(--accent-btn);color:var(--accent-text)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+  outline:2px solid var(--focus);outline-offset:3px;border-radius:6px;
+}
+
+/* ============ HEADER ============ */
+.hdr{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--ground) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+}
+.hdr-in{display:flex;align-items:center;gap:20px;height:72px}
+.logo{display:inline-flex;align-items:center;text-decoration:none;flex:none}
+.logo img{height:38px;width:auto}
+.ftr .logo img{height:44px}
+@media (max-width:560px){.logo img{height:32px}}
+.nav{display:flex;gap:26px;margin-left:auto;font-size:.9rem;color:var(--ink-2)}
+.nav a{text-decoration:none;display:inline-flex;align-items:center;min-height:24px;padding:4px 0}
+.nav a:hover{color:var(--accent-text)}
+.hdr-tel{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.95rem;text-decoration:none;font-variant-numeric:tabular-nums}
+/* Кнопка вместо номера — только на странице соискателей. Ниже она ужимается
+   так же, как ужимался номер: на узком экране в шапке и без неё тесно. */
+.hdr-form{height:40px;padding:0 18px;font-size:.88rem;white-space:nowrap;flex:none}
+.hdr-form-short{display:none}
+@media (max-width:900px){.hdr-form{margin-left:auto}}
+/* Замерено: с полной надписью шапка на экране 390 растягивалась до 425 px
+   и страница ехала вбок. Ниже 620 показываем короткое слово. */
+@media (max-width:620px){
+  .hdr-form{height:44px;padding:0 14px;font-size:.86rem}
+  .hdr-form-full{display:none}
+  .hdr-form-short{display:inline}
+}
+@media (max-width:900px){.nav{display:none}.hdr-tel{margin-left:auto}}
+/* На узком экране в шапке четыре элемента: логотип, телефон, язык, меню.
+   Вместе они не влезают в 360 px, поэтому номер сворачивается в иконку —
+   ссылка остаётся нажимаемой и сохраняет размер 44x44. */
+@media (max-width:560px){
+  .hdr-in{gap:12px}
+  .hdr-tel span{display:none}
+  .hdr-tel{width:44px;height:44px;justify-content:center;flex:none}
+}
+/* На 320 px логотип, телефон, переключатель языка и бургер вместе просят 304 px,
+   а места 257 — шапка вылезала за экран на 11 px. Ужимаем зазор, логотип
+   и слово «English» до кода языка. Размеры нажатия 44×44 не трогаем. */
+/* правило по умолчанию идёт ПЕРЕД медиазапросом: при равной силе побеждает
+   то, что написано ниже, и короткий код иначе оставался скрытым */
+.lang-short{display:none}
+@media (max-width:380px){
+  .hdr-in{gap:8px}
+  .logo img{height:28px}
+  .lang-full{display:none}
+  .lang-short{display:inline}
+}
+
+/* ============ HERO ============ */
+.hero{padding:64px 0 56px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center}
+.hero-copy{display:grid;gap:24px;align-content:start;min-width:0}
+.hero-copy>*,.sec-head>*,.type>*,.step>div>*{min-width:0}
+/* Перенос по слогам, а не разрыв посреди буквосочетания. Нужен и в h3:
+   на 320 px «Многофункциональный» в карточке шире колонки, и без переноса
+   слово рвётся как попало. Язык страницы задан, браузер переносит по правилам. */
+h1,h2,h3{hyphens:auto}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px}
+/* figure своим тегом приносит margin браузера — обнуляем классом, а не в стиле
+   элемента: инлайн сильнее медиазапросов, и на телефоне кадр не вышел бы за поля. */
+.hero-photo{position:relative;margin:0}
+.list-hero{gap:.55rem}
+.hero-photo img{width:100%;border-radius:var(--radius);aspect-ratio:4/3;object-fit:cover}
+.hero-photo.figure img{object-fit:contain;background:var(--surface-2);border:1px solid var(--line);padding:18px 0}
+.hero-badge{
+  position:absolute;left:-16px;bottom:-16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:14px 18px;display:grid;gap:2px;box-shadow:0 12px 30px rgba(34,24,22,.10);
+}
+.hero-badge b{font-family:Literata,serif;font-size:1.5rem;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.hero-badge span{font-size:.78rem;color:var(--ink-2)}
+@media (max-width:880px){
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:32px}
+}
+
+/* ============ FACTS ============ */
+.facts{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2)}
+.facts-in{display:grid;grid-template-columns:repeat(4,1fr)}
+/* Отступ нужен с обеих сторон: слева от разделителя, справа до следующего разделителя.
+   Без правого текст упирался в линию соседней колонки на узком экране. */
+.fact{padding:26px 24px;display:grid;gap:4px;border-left:1px solid var(--line)}
+.fact:first-child{border-left:0;padding-left:0}
+.fact:last-child{padding-right:0}
+.fact b{font-family:Literata,serif;font-size:1.75rem;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.fact span{font-size:.85rem;color:var(--ink-2)}
+@media (max-width:760px){
+  .facts-in{grid-template-columns:1fr 1fr}
+  /* сетка 2×2: слева стоят 1 и 3, справа 2 и 4 — у них отступ снимается со стороны края */
+  .fact{padding:20px}
+  .fact:nth-child(3){border-left:0;padding-left:0}
+  .fact:nth-child(2),.fact:nth-child(4){padding-right:0}
+  .fact:nth-child(3),.fact:nth-child(4){border-top:1px solid var(--line)}
+}
+
+/* ============ SECTION ============ */
+.sec{padding:76px 0}
+.sec-head{display:grid;gap:14px;margin-bottom:36px;max-width:66ch}
+@media (max-width:760px){.sec{padding:52px 0}}
+
+/* types of nannies */
+.types{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+@media (max-width:900px){.types{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (max-width:520px){.types{grid-template-columns:minmax(0,1fr)}}
+.type{background:var(--surface);padding:26px 24px;display:grid;gap:10px;align-content:start}
+.type .ic{margin-bottom:2px}
+.type p{font-size:.92rem;color:var(--ink-2)}
+
+/* duties + checks */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:start}
+@media (max-width:880px){.split{grid-template-columns:minmax(0,1fr);gap:40px}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:30px 28px}
+.panel h3{margin-bottom:18px}
+
+/* steps */
+.steps{display:grid;gap:0;counter-reset:s}
+/* Разделитель ставится МЕЖДУ строками, а не после последней. Линия в самом низу
+   списка не разделяет ничего: она либо дублирует край карточки, либо повисает
+   в воздухе. Это правило действует и ниже — в витрине, в вопросах и в таблице. */
+.step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--line)}
+.step b{font-family:Literata,serif;font-size:1.35rem;color:var(--accent);line-height:1.2;font-variant-numeric:tabular-nums}
+.step h3{margin-bottom:5px}
+.step p{font-size:.94rem;color:var(--ink-2);max-width:60ch}
+/* узкий вариант шага на странице услуги: колонка текста обязана ужиматься,
+   поэтому minmax(0,1fr), а не 1fr — иначе длинное слово распирает страницу */
+.step-sm{grid-template-columns:34px minmax(0,1fr);gap:16px}
+/* На 320 px этот шаг стоит внутри панели, и колонке текста остаётся 149 px —
+   «стрессоустойчивость» просит 160. Номер уходит на строку выше. */
+@media (max-width:380px){.step-sm{grid-template-columns:minmax(0,1fr);gap:6px}}
+
+/* schedule table */
+.tbl{width:100%;border-collapse:collapse;font-size:.94rem}
+.tbl-cap{text-align:left;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding-bottom:12px}
+.tbl-wrap:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.tbl th,.tbl td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+/* Заголовок строки, а не колонки: прописные с разрядкой здесь читаются как ярлык,
+   а это подпись к значению. Пример — реквизиты компании в политике данных. */
+.tbl th[scope="row"]{font-size:.92rem;letter-spacing:0;text-transform:none;
+  color:var(--ink-2);font-weight:600;width:36%;vertical-align:top;
+  padding:12px 14px;border-bottom:1px solid var(--line)}
+/* в такой таблице справа не цифра, а адрес — ему нужно переноситься,
+   иначе на телефоне строка уезжает вбок */
+.tbl th[scope="row"] ~ td{white-space:normal}
+.tbl th{font-weight:600;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--line-strong)}
+.tbl td:last-child{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:10px 22px 18px}
+@media (max-width:560px){.tbl-wrap{padding:8px 16px 14px}}
+/* крайние ячейки не липнут к рамке при горизонтальной прокрутке */
+.tbl th:first-child,.tbl td:first-child{padding-left:0}
+.tbl th:last-child,.tbl td:last-child{padding-right:0}
+/* и th тоже: в таблице реквизитов подпись строки — это th, и без этой строки
+   у последней строки оставалась половина линии */
+.tbl tr:last-child td, .tbl tr:last-child th{border-bottom:0}
+.note{margin-top:16px;font-size:.9rem;color:var(--ink-2);display:grid;gap:.6rem}
+
+/* dark band */
+.band{background:var(--deep);color:var(--deep-ink);position:relative;overflow:hidden}
+.band-photo{position:absolute;inset:0}
+.band-photo img{width:100%;height:100%;object-fit:cover;opacity:.26;filter:saturate(.75)}
+/* Эти блоки — сами .wrap. Поэтому только padding-block: короткая запись padding
+   обнулила бы боковые 24 px из .wrap, и текст лёг бы на край экрана. */
+.band-in{position:relative;padding-block:84px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+.band h2{color:var(--surface)}
+.band p{color:#E8DCD7}
+.band .eyebrow{color:var(--accent)}
+.band .eyebrow::after{background:rgba(255,255,255,.2)}
+.band-list{display:grid;gap:14px}
+.band-list .li{color:var(--stage-2);font-size:.95rem}
+.band-list .ic{stroke:var(--accent)}
+@media (max-width:880px){.band-in{grid-template-columns:1fr;gap:32px;padding-block:56px}}
+
+/* price */
+.price{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.price-cell{background:var(--surface);padding:30px 28px;display:grid;gap:14px;align-content:start}
+/* min-width:0 обязателен: элемент гибкой строки по умолчанию не ужимается уже
+   своего самого длинного слова, и «по договорённости» вылезало за карточку */
+.price-big{display:flex;align-items:baseline;gap:.5rem;min-width:0}
+.price-big b{font-family:Literata,serif;font-size:3rem;line-height:1;color:var(--accent);
+  font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:break-word;hyphens:auto}
+.price-big span{font-size:.95rem;color:var(--ink-2);max-width:22ch}
+/* у разовых услуг вместо числа стоит слово («по смете», «per booking») —
+   в строку оно не помещается и прижимает подпись к рамке */
+.price-big b.word{font-size:1.9rem;line-height:1.15}
+@media (max-width:560px){
+  .price-big{flex-wrap:wrap;gap:.3rem .6rem}
+  .price-big span{max-width:100%}
+  .price-cell{padding:24px 22px}
+}
+.price-rows{display:grid;gap:0}
+.price-row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-top:1px solid var(--line);font-size:.94rem}
+.price-row span:last-child{font-weight:600;color:var(--accent-text);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:760px){.price{grid-template-columns:1fr}}
+
+/* faq */
+.faq{display:grid;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:last-child{border-bottom:0}
+.faq summary{
+  list-style:none;cursor:pointer;padding:20px 0;display:grid;grid-template-columns:1fr 20px;gap:16px;align-items:center;
+  font-family:Literata,serif;font-size:1.05rem;font-weight:600;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .ic{transition:transform .2s ease}
+.faq details[open] summary .ic{transform:rotate(45deg)}
+.faq p{padding:0 0 22px;color:var(--ink-2);max-width:70ch;font-size:.96rem}
+
+/* form */
+.form-sec{background:var(--surface-2);border-top:1px solid var(--line)}
+.form-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:56px;align-items:start}
+/* Анкета соискателя длинная, и левая колонка уезжала вверх, оставляя половину
+   экрана пустой. Липкая колонка держит заголовок и условия рядом с полями. */
+@media (min-width:881px){.form-grid > div:first-child{position:sticky;top:96px}}
+@media (max-width:880px){.form-grid{grid-template-columns:1fr;gap:36px}}
+form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:30px 28px}
+.field{display:grid;gap:7px}
+/* Только прямая подпись поля. Без «>» правило цепляло и кнопки-галочки внутри
+   поля — они тоже label, — и ответы вроде «полный день» выходили прописными. */
+.field > label{font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.field input,.field select,.field textarea{
+  font-family:inherit;font-size:.98rem;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line-strong);border-radius:10px;padding:13px 14px;width:100%;
+}
+.field textarea{min-height:96px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+/* ---- анкета соискателя: группы полей и кнопки-галочки ----
+   Анкета длинная по делу: она заменяет собой телефонный разговор. Чтобы её
+   дочитывали, поля разбиты на именованные группы, а множественный выбор сделан
+   кнопками, а не столбиком галочек: на телефоне столбик из шести строк
+   занимает пол-экрана, кнопки укладываются в две. */
+.f-hint{font-size:.88rem;color:var(--ink-3);margin:-4px 0 2px}
+.fgroup{display:flex;align-items:center;gap:12px;margin-top:12px}
+.fgroup:first-of-type{margin-top:0}
+.fgroup-h{font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent-text);white-space:nowrap}
+.fgroup::after{content:"";flex:1;height:1px;background:var(--line)}
+/* подпись к группе кнопок: тот же вид, что у label обычного поля */
+.lbl{font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+/* Галочка настоящая, а не спрятанная: так виден фокус с клавиатуры и состояние
+   читает программа чтения с экрана. 44 px — нижний предел размера цели нажатия. */
+/* padding по вертикали, а не только min-height: длинный ответ переносится
+   на две строки, и без него текст упирался в скруглённую рамку */
+.chip{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:9px 15px;
+  border:1px solid var(--line-strong);border-radius:999px;background:var(--surface-2);
+  font-size:.92rem;line-height:1.25;cursor:pointer;transition:border-color .14s ease,background .14s ease}
+.chip input{width:18px;height:18px;margin:0;flex:none;accent-color:var(--accent-btn);cursor:pointer}
+.chip:hover{border-color:var(--accent-btn)}
+.chip:has(input:checked){border-color:var(--accent-btn);background:var(--accent-soft);color:var(--accent-text)}
+.chip:focus-within{outline:2px solid var(--focus);outline-offset:2px}
+/* «да или нет» — одна широкая кнопка на всю строку: вопрос длиннее ярлыка */
+.chip-yes{width:100%;justify-content:flex-start;padding:13px 15px;text-align:left}
+.qset{display:grid;gap:16px}
+.btn-wide{width:100%}
+/* padding по вертикали обязателен и здесь: короткая запись «0 13px» обнуляла
+   верх и низ, и на телефоне текст в две строки упирался в рамку */
+@media (max-width:560px){.chip{font-size:.88rem;padding:8px 13px}}
+.consent{font-size:.82rem;color:var(--ink-3);display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:center;cursor:pointer}
+.consent input{width:24px;height:24px;margin:0;accent-color:var(--accent-btn);cursor:pointer}
+.ok{display:none;background:var(--accent-soft);border:1px solid var(--accent-btn);color:var(--accent-text);border-radius:10px;padding:14px 16px;font-size:.94rem}
+.ok.show{display:block}
+
+/* footer */
+.ftr{background:var(--deep);color:var(--deep-ink);padding:52px 0 40px;font-size:.92rem}
+.ftr-in{display:grid;grid-template-columns:1.25fr 1fr .8fr .9fr;gap:36px}
+@media (max-width:1000px){.ftr-in{grid-template-columns:1fr 1fr}}
+.ftr-h{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--on-deep-3);margin:0 0 14px;font-weight:600}
+.ftr a{text-decoration:none;color:var(--on-deep)}
+.ftr a:hover{color:var(--accent)}
+.ftr ul{display:grid;gap:4px}
+.ftr ul a{display:inline-flex;align-items:center;min-height:24px}
+.ftr ul li{min-height:24px;display:flex;align-items:center}
+.ftr .logo{color:var(--surface)}
+.ftr-note{margin-top:38px;padding-top:22px;border-top:1px solid rgba(255,255,255,.12);color:var(--on-deep-4);font-size:.82rem;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+@media (max-width:760px){.ftr-in{grid-template-columns:1fr;gap:32px}}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ============ ШАПКА: выпадающее меню и бургер ============ */
+.nav-btn{display:inline-flex;align-items:center;gap:.35rem;min-height:24px;padding:4px 0;
+  font:inherit;font-size:.9rem;color:var(--ink-2);background:none;border:0;cursor:pointer}
+.nav-btn .ic{width:16px;height:16px;transition:transform .2s ease}
+.has-drop.open .nav-btn .ic{transform:rotate(180deg)}
+.has-drop{position:relative}
+.drop{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(-6px);
+  opacity:0;visibility:hidden;transition:opacity .16s ease,transform .16s ease;z-index:30}
+/* Мостик через зазор между кнопкой и панелью. Панель отстоит на 14 px, и мышь,
+   идя к списку, пересекает пустоту — указатель покидает область, список закрывается
+   под курсором. Невидимая полоса делает путь непрерывным. */
+.drop::before{content:"";position:absolute;left:0;right:0;top:-18px;height:18px}
+.has-drop.open .drop{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+/* Выпадающий список услуг: карточка с превью, названием и одной строкой о сути.
+   Три колонки по семь строк — двадцать одна услуга помещается на экран без прокрутки.
+   Четыре колонки, как у соседей с двенадцатью услугами, здесь вылезают за край. */
+.drop-in{display:grid;grid-template-columns:repeat(3,minmax(268px,1fr));gap:0 6px;
+  padding:12px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:0 18px 44px rgba(34,24,22,.14);
+  /* на низком экране ноутбука панель не обрезается, а прокручивается */
+  max-height:calc(100vh - 110px);overflow-y:auto}
+.drop-in a{display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px;align-items:center;
+  min-height:56px;padding:6px 8px;border-radius:10px;text-decoration:none;color:var(--ink);
+  transition:background .14s ease}
+.drop-in a:hover{background:var(--surface-2)}
+.drop-in a:hover b{color:var(--accent-text)}
+.drop-in img{width:56px;height:42px;object-fit:cover;border-radius:6px;display:block}
+.d-t{min-width:0}
+.d-t b{display:block;font-size:.87rem;font-weight:600;line-height:1.25}
+/* подпись не длиннее двух строк: иначе панель из 21 услуги не помещается на ноутбуке */
+.d-t span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:.78rem;color:var(--ink-3);line-height:1.3;margin-top:2px}
+.nav a.on{color:var(--accent-text);font-weight:600}
+.burger{display:none;width:44px;height:44px;flex:none;flex-direction:column;justify-content:center;
+  gap:5px;padding:0 10px;background:none;border:0;cursor:pointer}
+/* flex:none обязателен — иначе на узком экране кнопка сжимается до 20 px
+   и перестаёт попадать в норму 24x24 для целей касания */
+.burger span{display:block;height:2px;background:var(--ink);border-radius:2px;transition:transform .2s ease,opacity .2s ease}
+.burger.x span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.x span:nth-child(2){opacity:0}
+.burger.x span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-menu{display:grid;gap:2px;padding:14px 24px 22px;background:var(--surface);
+  border-top:1px solid var(--line);max-height:70vh;overflow-y:auto}
+.mob-menu a{display:flex;align-items:center;min-height:44px;text-decoration:none;font-size:1rem}
+.mob-menu a:hover{color:var(--accent-text)}
+.mob-h{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+@media (max-width:1040px){
+  .nav{display:none}
+  .burger{display:flex}
+  .hdr-tel{margin-left:auto}
+}
+@media (min-width:1041px){.mob-menu{display:none!important}}
+
+/* ============ ПЕРВЫЙ ЭКРАН СО СМЕНОЙ КАДРОВ ============ */
+.stage{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+  background:linear-gradient(160deg,var(--stage-1) 0%,var(--stage-2) 46%,var(--stage-3) 100%)}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 80% at 76% 62%,rgba(241,88,8,.16),transparent 68%)}
+.stage::after{content:"";position:absolute;right:-6%;top:50%;transform:translateY(-50%);
+  width:min(52vw,660px);aspect-ratio:1;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,255,255,.78),rgba(255,255,255,0) 66%)}
+.slide{display:none}
+.slide.on{display:block}
+.stage-in{position:relative;z-index:1;display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:40px;
+  align-items:center;min-height:620px;padding-block:46px}
+.stage-copy{display:grid;gap:20px;align-content:center}
+.slide-h{font-family:Literata,Georgia,serif;font-weight:600;letter-spacing:-.015em;margin:0;
+  font-size:clamp(2.3rem,1.1rem + 3.4vw,3.6rem);line-height:1.03;
+  text-wrap:balance;overflow-wrap:break-word;hyphens:auto}
+.slide-h em{font-style:normal;color:var(--accent)}
+.stage .lede{font-size:1.1rem;color:var(--ink-2);max-width:46ch}
+.stage-marks{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:2px}
+.stage-marks span{display:inline-flex;align-items:center;gap:.5rem;font-size:.9rem;color:var(--ink-2)}
+.stage-marks .ic{width:18px;height:18px}
+.stage-photo{position:relative;display:flex;align-items:flex-end;justify-content:center;
+  align-self:stretch;min-height:520px}
+.stage-photo::before{content:"";position:absolute;left:50%;bottom:44px;transform:translateX(-50%);
+  width:min(94%,430px);height:min(94%,430px);border-radius:50%;
+  background:radial-gradient(circle at 50% 45%,#fff 0%,rgba(255,255,255,.72) 52%,rgba(255,255,255,0) 72%)}
+.stage-photo::after{content:"";position:absolute;left:50%;bottom:52px;transform:translateX(-50%);
+  width:min(62%,260px);height:26px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(34,24,22,.20),transparent 72%)}
+.stage-photo img{position:relative;width:auto;max-width:100%;height:auto;
+  max-height:520px;margin-bottom:52px;filter:drop-shadow(0 24px 26px rgba(34,24,22,.20))}
+.stage-photo.wide img{max-height:470px;margin-bottom:34px}
+.dots{position:absolute;left:0;right:0;bottom:22px;z-index:2;
+  display:flex;justify-content:center;gap:10px}
+.dots button{width:32px;height:32px;padding:0;background:none;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.dots button::before{content:"";width:9px;height:9px;border-radius:50%;
+  background:var(--line-strong);transition:background .2s ease,transform .2s ease}
+.dots button.on::before{background:var(--accent);transform:scale(1.4)}
+/* Первый экран на телефоне собран одним блоком в конце файла — искать там. */
+
+/* ============ БЛОКИ ГЛАВНОЙ ============ */
+.about{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+@media (max-width:880px){.about{grid-template-columns:minmax(0,1fr);gap:28px}}
+.about-text{display:grid;gap:16px;color:var(--ink-2)}
+.about-text p{max-width:68ch}
+.reasons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+@media (max-width:760px){.reasons{grid-template-columns:minmax(0,1fr)}}
+/* Три колонки — только на широком экране. Раньше это стояло инлайном прямо в шаблоне
+   гарантий, а инлайн сильнее медиазапроса: на телефоне оставались три колонки
+   по 90 px, и слова ломались по буквам. Число колонок задаётся только здесь. */
+.reasons-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:980px){.reasons-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.reasons-3{grid-template-columns:minmax(0,1fr)}}
+.reason{background:var(--surface);padding:26px 24px;display:grid;
+  grid-template-columns:44px minmax(0,1fr);gap:16px;align-items:start}
+/* На узком экране иконка встаёт над текстом. Иначе на 360 px текстовой колонке
+   остаётся 187 px, а слово «Конфиденциальность» просит 200 и ломается по буквам. */
+@media (max-width:420px){
+  .reason{grid-template-columns:minmax(0,1fr);gap:12px;padding:22px 20px}
+}
+.reason h3{margin-bottom:6px}
+.reason p{font-size:.92rem;color:var(--ink-2)}
+.tariffs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tariff b.word{font-size:1.5rem;line-height:1.15}
+/* Строка цены была свёрстана инлайном прямо в шаблоне. Инлайн нельзя поправить
+   медиазапросом, а без min-width элемент гибкой строки не ужимается уже своего
+   самого длинного слова: «по договорённости» вылезало за карточку на 320 px. */
+.tariff-price{display:flex;align-items:baseline;gap:.3rem;flex-wrap:wrap;min-width:0}
+.tariff-price b{min-width:0;overflow-wrap:break-word;hyphens:auto}
+/* «по договорённости» на 320 px рвалось посреди слова. Кегль на ступень ниже —
+   слово целиком помещается в колонку, переносить нечего. */
+@media (max-width:380px){.tariff b.word{font-size:1.25rem}}
+@media (max-width:880px){.tariffs{grid-template-columns:minmax(0,1fr)}}
+.tariff>*{min-width:0}
+.tariff{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px 26px;display:grid;gap:12px;align-content:start}
+.tariff.accent{border-color:var(--accent);box-shadow:0 12px 30px rgba(241,88,8,.10)}
+.tariff-h{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.tariff b{font-family:Literata,serif;font-size:2.4rem;line-height:1;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.tariff span.unit{font-size:.9rem;color:var(--ink-2)}
+.tariff p{font-size:.92rem;color:var(--ink-2)}
+
+/* ============ ПРОСТЫЕ СТРАНИЦЫ ============ */
+.page-head{padding-block:56px 8px}
+.page-head h1{font-size:clamp(2rem,1.3rem + 2vw,2.9rem)}
+.prose{display:grid;gap:18px;max-width:70ch;color:var(--ink-2);font-size:1.02rem}
+.prose h2{color:var(--ink);margin-top:18px}
+.prose h3{color:var(--ink);margin-top:10px}
+.prose strong{color:var(--ink)}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.contact-cell{background:var(--surface);padding:26px 24px;display:grid;gap:8px;align-content:start}
+.contact-cell .ic{margin-bottom:4px}
+.contact-cell a{text-decoration:none;font-weight:600}
+.contact-cell a:hover{color:var(--accent-text)}
+.map{margin-top:22px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+  background:var(--surface-2)}
+.map iframe{display:block;width:100%;height:420px;border:0}
+
+
+/* ============ ВИТРИНА УСЛУГ ============ */
+.svc-head{display:flex;flex-wrap:wrap;align-items:end;gap:20px 32px;margin-bottom:28px}
+/* 280 px — желаемая ширина, а не жёсткая: на экране 320 px колонке достаётся 257,
+   и жёсткий min-width выпихивал заголовок за край страницы */
+.svc-head>div:first-child{flex:1 1 280px;min-width:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.search{position:relative;width:100%;max-width:340px;margin-left:auto}
+.search input{width:100%;height:52px;padding:0 44px 0 46px;font-family:inherit;font-size:1rem;
+  color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:999px}
+.search input::placeholder{color:var(--ink-3)}
+.search>.ic{position:absolute;left:16px;top:16px;pointer-events:none}
+.search button{position:absolute;right:8px;top:8px;width:36px;height:36px;display:none;
+  align-items:center;justify-content:center;background:transparent;border:0;border-radius:999px;cursor:pointer}
+.search.has button{display:flex}
+.search button:hover{background:var(--accent-soft)}
+.cat-list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.cat+.cat{border-top:1px solid var(--line)}
+.cat[hidden]{display:none}
+.cat summary{list-style:none;cursor:pointer;display:grid;
+  grid-template-columns:44px minmax(0,1fr) auto 20px;align-items:center;gap:14px;
+  padding:16px 24px;min-height:76px;transition:background .15s ease}
+.cat summary::-webkit-details-marker{display:none}
+.cat summary:hover{background:var(--surface-2)}
+.ic-box{width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  background:var(--accent-soft);border-radius:12px;flex:none}
+.head{display:grid;gap:1px;min-width:0}
+.head b{font-size:1.05rem;font-weight:600}
+.hint{font-size:.84rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat[open] .hint{visibility:hidden}
+.cnt{font-size:.8rem;font-weight:600;color:var(--accent-text);font-variant-numeric:tabular-nums;
+  min-width:24px;text-align:right}
+.sign{transition:transform .2s ease}
+.cat[open] .sign{transform:rotate(45deg)}
+.cat .body{display:grid;grid-template-columns:236px minmax(0,1fr);gap:26px;align-items:start;
+  padding:4px 24px 24px 82px}
+/* Стопка кадров: фото раздела и по кадру на каждую услугу, один поверх другого.
+   Видим тот, у кого класс .on — его ставит скрипт при наведении на строку.
+   Кадры услуг приходят без адреса (он в data-src) и не качаются до первого
+   наведения. Задержка visibility при уходе держит кадр видимым, пока идёт
+   растворение, иначе он пропадал бы рывком. */
+.cat-ph{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;
+  align-self:start;background:var(--surface-2)}
+.cat-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;visibility:hidden;transition:opacity .18s ease,visibility 0s linear .18s}
+.cat-ph img.on{opacity:1;visibility:visible;transition:opacity .18s ease,visibility 0s}
+@media (max-width:760px){
+  .cat summary{padding:14px 16px;gap:12px}
+  .cat .body{grid-template-columns:minmax(0,1fr);padding:0 16px 20px;gap:16px}
+  .cat-ph{aspect-ratio:16/9}
+}
+.svcs{display:grid;align-content:start}
+.svc{display:grid;grid-template-columns:minmax(0,1fr) 20px;grid-template-rows:auto auto;
+  align-items:center;gap:2px 14px;padding:12px 0;min-height:52px;
+  border-bottom:1px solid var(--line);text-decoration:none;transition:padding-left .15s ease}
+.svc:first-child{border-top:1px solid var(--line)}
+.svc:last-child{border-bottom:0}
+.svc:hover{padding-left:8px}
+.svc b{grid-column:1;grid-row:1;font-size:1rem;font-weight:600}
+.svc:hover b{color:var(--accent-text)}
+.svc span{grid-column:1;grid-row:2;font-size:.86rem;color:var(--ink-2)}
+.svc .arr{grid-column:2;grid-row:1 / span 2}
+.svc[hidden]{display:none}
+.empty{display:none;padding:34px 24px;text-align:center}
+.empty.on{display:block}
+.empty p{color:var(--ink-2);margin-bottom:18px}
+
+.team-photo{width:100%;max-width:520px;height:auto}
+.about>*{min-width:0}
+
+.svcs-rel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+@media (max-width:760px){.svcs-rel{grid-template-columns:minmax(0,1fr)}}
+/* .svc — строка списка внутри витрины, у неё нет боковых отступов: их даёт контейнер.
+   Здесь строка сама становится карточкой, поэтому отступы нужны свои. */
+.svcs-rel .svc{background:var(--surface);padding:24px 26px;min-height:104px;align-content:center;
+  border-top:0;border-bottom:0;transition:background .15s ease}
+.svcs-rel .svc:hover{padding-left:26px;background:var(--surface-2)}
+@media (max-width:560px){.svcs-rel .svc{padding:20px 22px;min-height:92px}
+  .svcs-rel .svc:hover{padding-left:22px}}
+
+/* переключатель языка */
+.lang{display:inline-flex;align-items:center;justify-content:center;min-width:56px;min-height:28px;
+  padding:2px 12px;border:1px solid var(--line-strong);border-radius:999px;font-size:.82rem;
+  font-weight:600;text-decoration:none;color:var(--ink-2);white-space:nowrap;flex:none}
+.lang:hover{border-color:var(--accent-btn);color:var(--accent-text)}
+@media (max-width:560px){.lang{min-width:44px;padding:2px 9px;font-size:.78rem}}
+
+
+/* ============ ПЕРВЫЙ ЭКРАН НА ТЕЛЕФОНЕ: КАДР ВО ВСЮ ШИРИНУ ============
+   Выбрано Шефом 9 сентября 2026 из трёх вариантов: кадр от края до края,
+   под ним крупный заголовок на тёмном. На большом экране всё остаётся как было.
+
+   Почему текст НЕ лежит поверх фотографии, хотя в макете выглядело именно так.
+   Посчитал по настоящим пикселям всех 21 кадров: съёмка светлая, девяносто
+   процентов пикселей ярче 240, и чтобы надзаголовок дал норму 4,5:1, кадр
+   пришлось бы затемнить на 0,70 — фотография превращается в грязь.
+   Поэтому кадр держит свою яркость, его низ растворяется в фоне страницы,
+   а текст стоит уже на плотном тёмном: 15:1 при любой фотографии.
+   Верхние строки заходят на растворённый низ кадра — стык не читается,
+   вид тот же, что в утверждённом макете. Замер: .mos-web/gates/G23-hero-mobile.md */
+.stage-hero-copy{position:relative;z-index:2}
+@media (max-width:880px){
+  .hero, .stage{position:relative;padding:0;overflow:hidden;
+    background:var(--deep);border-bottom:0}
+  /* светлые пятна фона главной на тёмном не нужны */
+  .stage::before, .stage::after, .hero::after{display:none}
+
+  .hero-grid, .stage-in{position:static;display:flex;flex-direction:column;
+    width:100%;gap:0;min-height:0;padding-block:0 28px}
+
+  /* Кадр вылезает за поля .wrap на те же 24 px и идёт от края до края.
+     Секция с overflow:hidden — полосы прокрутки вбок от этого не будет. */
+  /* Высота кадра привязана к высоте экрана, а не к ширине: на низком телефоне
+     (SE, 667 px) фото ужимается и кнопка остаётся на первом экране. svh, а не vh,
+     потому что vh на телефоне считается без адресной строки и врёт на 60–90 px. */
+  .hero-photo, .stage-photo{order:-1;position:relative;z-index:0;
+    margin:0 -24px;min-height:0;height:clamp(240px,44svh,440px);
+    display:block;align-self:stretch}
+  .hero-photo picture, .stage-photo picture{display:block;height:100%}
+  .hero-photo img, .stage-photo img{position:static;width:100%;height:100%;
+    max-width:none;max-height:none;margin:0;border-radius:0;aspect-ratio:auto;
+    /* 16 %, а не центр: кадры сняты вертикально под полный экран, а здесь видна
+       верхняя треть — по центру головы срезало по линии волос. */
+    object-fit:cover;object-position:50% 16%;filter:none}
+  /* Низ кадра уходит в фон страницы. Затемнение доходит до 0,78 на 77 % высоты —
+     это порог, при котором надзаголовок даёт 4,9:1 даже на белом пикселе кадра
+     (посчитано по пикселям всех 21 фотографий). Текст поднят на 46 px, а нижняя
+     безопасная зона — 23 % высоты, то есть не меньше 55 px при самом низком кадре
+     в 240 px. Меняешь эти проценты — пересчитай запас. */
+  .hero-photo::after, .stage-photo::after{content:"";display:block;position:absolute;
+    left:0;right:0;top:0;bottom:0;width:auto;height:auto;transform:none;border-radius:0;
+    background:linear-gradient(to bottom,rgba(42,29,25,0) 34%,rgba(42,29,25,.34) 58%,
+      rgba(42,29,25,.86) 80%,var(--deep) 100%)}
+  .hero-photo::before, .stage-photo::before, .hero-badge{display:none}
+
+  /* -46px: текст поднимается на растворённый низ кадра. Больше нельзя —
+     выйдет на живую фотографию и потеряет контраст. */
+  .hero-copy, .stage-copy{order:1;position:relative;z-index:2;
+    gap:12px;margin-top:-46px;align-content:start}
+  /* Крупный текст первого экрана на телефоне ужимается: 1,1rem в шесть строк
+     съедали 174 px и выталкивали кнопку за экран. */
+  .hero .lede, .stage .lede{font-size:1rem;line-height:1.5;max-width:none}
+  .hero .eyebrow::after, .stage .eyebrow::after{display:none}
+  /* Ручной перенос в заголовке рассчитан на широкий экран. На телефоне он
+     добавляет лишнюю строку там, где текст и так переносится сам.
+     Перед каждым <br> в заголовке стоит пробел (soft_br в core.py): без него
+     скрытый перенос склеивает слова — «дома‌и компании». */
+  .hero h1 br, .stage .slide-h br{display:none}
+
+  .hero .eyebrow, .stage .eyebrow{color:var(--photo-eyebrow)}
+  .hero .eyebrow::after, .stage .eyebrow::after{background:rgba(255,255,255,.24)}
+  .hero h1, .stage h1, .stage .slide-h{color:var(--photo-title)}
+  .hero h1 em, .stage h1 em, .stage .slide-h em{color:var(--photo-accent)}
+  .hero .lede, .stage .lede{color:color-mix(in srgb,var(--photo-title) 90%,transparent)}
+  .hero .list .li span, .stage-marks span{color:color-mix(in srgb,var(--photo-title) 88%,transparent)}
+  .hero .list .ic, .stage-marks .ic{stroke:var(--photo-accent)}
+  .hero .btn-primary, .stage .btn-primary{background:var(--photo-btn);border-color:var(--photo-btn);color:var(--photo-btn-ink)}
+  .hero .btn-ghost, .stage .btn-ghost{color:var(--photo-title);border-color:rgba(255,255,255,.45)}
+  .hero .btn-ghost:hover, .stage .btn-ghost:hover{border-color:var(--photo-accent);color:var(--photo-accent)}
+
+  /* ---- главная: та же вёрстка, но кадр — вырезанная команда ----
+     Фигуры в чёрной форме на тёмном пропадают, поэтому полоса светлая,
+     фирменная, с бликом за спинами. В тёмный текстовый блок она уходит
+     градиентом ниже колен — стык не читается, а форма остаётся на свету. */
+  .stage-photo.team{display:flex;align-items:flex-end;justify-content:center;
+    height:clamp(270px,44svh,400px);padding:12px 24px 64px;
+    /* Переход в тёмное — в самой заливке полосы, а не полупрозрачной плёнкой
+       поверх: плёнка на светлом фоне даёт грязную серую муть под ногами. */
+    background:
+      radial-gradient(62% 46% at 50% 38%,rgba(255,255,255,.92),rgba(255,255,255,0) 74%),
+      radial-gradient(86% 48% at 50% 62%,rgba(241,88,8,.12),transparent 74%),
+      linear-gradient(to bottom,var(--stage-1) 0%,var(--stage-2) 38%,
+        var(--stage-3) 64%,var(--stage-4) 84%,var(--deep) 100%)}
+  /* margin:0 обязателен: у .stage-photo.wide в базе стоит margin-bottom:34px,
+     сила селектора та же, и фигуры поднимались на 34 px — головы срезало. */
+  .stage-photo.team img{position:static;width:auto;max-width:100%;height:100%;
+    max-height:none;margin:0;object-fit:contain;object-position:bottom;
+    filter:drop-shadow(0 16px 18px rgba(34,24,22,.18))}
+  /* Фигуры стоят до 77 % высоты полосы, ниже пол уходит в тёмное. Плёнка поверх
+     кадра тут не нужна — темнеет сама заливка, и текст начинается ровно там,
+     где фон уже сплошной --deep: контраст не зависит ни от чего. */
+  .stage-photo.team::after, .stage-photo.team::before{display:none}
+  .stage-team .stage-copy{margin-top:0;padding-top:18px}
+
+  /* Кнопки в одну строку: две друг под другом съедали 116 px первого экрана.
+     Вторая на телефоне — ссылка, а не рамка: «Стоимость услуг» рядом с «Оставить
+     заявку» в рамке не помещается и переносится на свою строку. Высота 44 px
+     сохранена — это нижний предел размера цели нажатия. */
+  .hero .hero-cta, .stage .hero-cta{gap:8px 14px;align-items:center}
+  /* max-width, чтобы на планшете кнопка не растягивалась на пол-экрана. */
+  .hero .hero-cta .btn-primary, .stage .hero-cta .btn-primary{flex:1 1 auto;min-width:0;
+    max-width:340px;justify-content:center;padding-inline:18px}
+  .hero .hero-cta .btn-ghost, .stage .hero-cta .btn-ghost{flex:0 0 auto;
+    border:0;background:none;padding:0 2px;min-height:44px;color:var(--photo-accent);
+    text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px}
+  .hero .hero-cta .btn-ghost:hover, .stage .hero-cta .btn-ghost:hover{color:var(--photo-accent-2)}
+  /* Опорные пункты — по строке на пункт, без разгона: было 202 px, стало 84. */
+  .hero .list{gap:.45rem}
+  .hero .list .li span{font-size:.92rem;line-height:1.35}
+  .dots{position:static;padding-bottom:22px}
+}
+@media (max-width:380px){
+  /* На 320 кнопка и ссылка в строку не помещаются — ссылка уходит под кнопку. */
+  .hero .hero-cta .btn-primary, .stage .hero-cta .btn-primary{flex:1 1 100%}
+}
+/* Низкий экран (iPhone SE, 667 px) — ужимаем по высоте, а не по ширине:
+   ширина там обычная, не хватает именно высоты, и кнопка уходила за край. */
+@media (max-width:880px) and (max-height:700px){
+  .hero-photo, .stage-photo{height:clamp(200px,32svh,300px)}
+  .hero-copy, .stage-copy{gap:10px}
+  .hero .lede, .stage .lede{font-size:.97rem;line-height:1.45}
+  .hero h1, .stage .slide-h{font-size:clamp(1.9rem,1.1rem + 3vw,2.3rem)}
+}
