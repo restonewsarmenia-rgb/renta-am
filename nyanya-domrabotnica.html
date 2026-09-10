@@ -9,8 +9,8 @@
 <link rel="alternate" hreflang="en" href="https://renta.am/en/nyanya-domrabotnica.html">
 <link rel="alternate" hreflang="x-default" href="https://renta.am/nyanya-domrabotnica.html">
 <link rel="icon" type="image/png" sizes="32x32" href="img/fav-32.png?v=6aeff4a9">
-<link rel="icon" type="image/png" sizes="192x192" href="img/fav-192.png?v=5bc50661">
-<link rel="apple-touch-icon" href="img/fav-180.png?v=a86570bb">
+<link rel="icon" type="image/png" sizes="192x192" href="img/fav-192.png?v=fe5dd46e">
+<link rel="apple-touch-icon" href="img/fav-180.png?v=384d3fbf">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Renta Staffing Agency">
 <meta property="og:locale" content="ru_RU">
@@ -224,8 +224,8 @@
       <li class="li"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span>Ереван, улица Маршала Бабаджаняна, 4/12</span></li>
     </ul>
   </div>
-  <form id="lead" action="https://api.web3forms.com/submit" method="post">
-    <input type="hidden" name="access_key" value="0d5151f7-aec5-4da9-a75c-bd2398af1238"><input type="hidden" name="subject" value="Renta — заявка с сайта: Няня-домработница"><input type="hidden" name="from_name" value="Renta Staffing Agency"><input type="hidden" name="page" value="https://renta.am/nyanya-domrabotnica.html"><input class="hp" type="text" name="botcheck" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <form id="lead" action="/api/form" method="post">
+    <input type="hidden" name="subject" value="Renta — заявка с сайта: Няня-домработница"><input type="hidden" name="from_name" value="Renta Staffing Agency"><input type="hidden" name="page" value="https://renta.am/nyanya-domrabotnica.html"><input class="hp" type="text" name="botcheck" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="row2">
       <div class="field"><label for="name">Ваше имя</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Анна" required></div>
       <div class="field"><label for="tel">Телефон</label><input id="tel" name="tel" type="tel" autocomplete="tel" placeholder="+374 __ ___ ___" required></div>
@@ -346,8 +346,34 @@
     ok.classList.remove('show');
     var data={};
     new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
+    // Читаемые строки для Телеграма: подписи берём из самой разметки, поэтому
+    // они всегда совпадают с тем, что человек видел на экране, и переводятся
+    // вместе со страницей. Без этого в заявке стояли бы q0, q1, q3 —
+    // имена полей анкеты, по которым вопрос не восстановить.
+    var seen={}, pretty=[];
+    Array.prototype.forEach.call(f.elements,function(el){
+      var n=el.name;
+      if(!n||el.disabled||el.type==='hidden'||el.type==='submit') return;
+      if((el.type==='checkbox'||el.type==='radio')&&!el.checked) return;
+      var v=(el.value||'').trim(); if(!v) return;
+      if(el.type==='checkbox'&&n==='consent') v='да';
+      var box=el.closest('.fgroup,.field,.consent'),
+          qe=box?(box.querySelector('.lbl')||box.querySelector(':scope > label')):null,
+          q=qe?qe.textContent.trim().replace(/\s+/g,' '):'';
+      // Два случая, когда подписи над полем нет и вопрос вышел бы пустым или
+      // именем поля. Замерено на анкете: было «consent: да» и «: Да».
+      //   согласие — подпись обёрнута вокруг самой галочки;
+      //   «работа в регионах» — над кнопкой-галочкой стоит пустой .lbl,
+      //   он держит место в сетке, а вопрос написан на самой кнопке.
+      // В обоих случаях берём текст ближайшей подписи-обёртки.
+      if(!q){ var lab=el.closest('label'); q=lab?lab.textContent.trim().replace(/\s+/g,' '):''; }
+      if(!q) q=n;
+      if(seen[n]!==undefined){ pretty[seen[n]]+=', '+v; }
+      else { seen[n]=pretty.length; pretty.push(q+': '+v); }
+    });
+    data.pretty=pretty.join('\n');
     if(btn){ btn.disabled=true; btn.textContent='Отправляем…'; }
-    fetch('https://api.web3forms.com/submit',{method:'POST',
+    fetch('/api/form',{method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(data)})
       .then(function(r){ return r.json(); })
