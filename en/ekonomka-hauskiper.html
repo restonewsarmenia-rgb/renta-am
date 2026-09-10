@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;600&display=swap">
 
-<link rel="stylesheet" href="../assets/site.css?v=fd946a72">
+<link rel="stylesheet" href="../assets/site.css?v=ce9b8e78">
 <style>.rowh{text-transform:none;font-size:.94rem;letter-spacing:0;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line)}</style>
 
 <a class="skip" href="#top">Skip to content</a>
@@ -224,11 +224,13 @@
       <li class="li"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span>4/12 Marshal Babajanyan Street, Yerevan</span></li>
     </ul>
   </div>
-  <form id="lead" action="/api/lead" method="post">
+  <form id="lead" action="https://api.web3forms.com/submit" method="post">
+    <input type="hidden" name="access_key" value="0d5151f7-aec5-4da9-a75c-bd2398af1238"><input type="hidden" name="subject" value="Renta — enquiry from the site: House manager"><input type="hidden" name="from_name" value="Renta Staffing Agency"><input type="hidden" name="page" value="https://renta.am/en/ekonomka-hauskiper.html"><input class="hp" type="text" name="botcheck" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="row2">
       <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Anna" required></div>
       <div class="field"><label for="tel">Phone</label><input id="tel" name="tel" type="tel" autocomplete="tel" placeholder="+374 __ ___ ___" required></div>
     </div>
+    <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="anna@example.com"></div>
     <div class="row2">
       <div class="field"><label for="format">What you need</label><select id="format" name="format">
             <option>Five full days a week</option>
@@ -239,10 +241,12 @@
       <div class="field"><label for="extra">Number of staff</label><input id="extra" name="extra" type="text" placeholder="4 staff"></div>
     </div>
     <div class="field"><label for="msg">The job and the schedule</label><textarea id="msg" name="msg" placeholder="Country house of 400 m², garden and pool, need the budget and the contractors watched"></textarea></div>
-    <label class="consent"><input type="checkbox" id="agree" required><span>I agree to my personal data being processed so that you can reply to this enquiry</span></label>
+    <label class="consent"><input type="checkbox" id="agree" name="consent" value="Yes" required><span>I agree to my personal data being processed so that you can reply to this enquiry</span></label>
     <button class="btn btn-primary" type="submit" style="width:100%">Send enquiry</button>
+    <p class="form-note">We reply during office hours. Your details go to us and no one else.</p>
     <div class="ok" id="ok" role="status"></div>
   </form>
+  <div class="done" id="done" role="status" tabindex="-1" hidden><h3>Request received</h3><p>We will be in touch during office hours. If it is urgent, write to office@renta.am.</p></div>
 </div></section>
 </main>
 
@@ -275,7 +279,9 @@
       <li>4/12 Marshal Babajanyan Street, Yerevan</li>
     </ul></div>
   </div>
-  <div class="ftr-note"><span>© 2026 Renta Staffing Agency</span><span>The form does not send yet – the handler is being connected.</span></div>
+  <!-- Второй строки здесь больше нет: там стояло «форма пока не отправляет».
+       Формы отправляют, и оговорка стала неправдой. -->
+  <div class="ftr-note"><span>© 2026 Renta Staffing Agency</span></div>
 </div></footer>
 
 <script>
@@ -324,14 +330,39 @@
   if(bur&&mob){bur.addEventListener('click',function(){
     var on=mob.hidden; mob.hidden=!on; bur.setAttribute('aria-expanded',on); bur.classList.toggle('x',on);});}
 })();
-document.getElementById('lead').addEventListener('submit', function(e){
-  e.preventDefault();
-  var name=document.getElementById('name').value.trim(), tel=document.getElementById('tel').value.trim(), ok=document.getElementById('ok');
-  if(!name||!tel){ ok.textContent='We need a name and a number to call you back.'; ok.classList.add('show'); return; }
-  if(!document.getElementById('agree').checked){ ok.textContent='Please tick the consent box.'; ok.classList.add('show'); return; }
-  ok.textContent=name+', thank you – we have your enquiry and will call you back during working hours. (Demonstration layout: the form does not send anywhere.)';
-  ok.classList.add('show');
-});
+
+(function(){
+  var f=document.getElementById('lead');
+  if(!f) return;
+  var ok=document.getElementById('ok'), done=document.getElementById('done'),
+      btn=f.querySelector('button[type=submit]'), label=btn?btn.textContent:'';
+  function say(msg){ ok.textContent=msg; ok.classList.add('show'); }
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name=document.getElementById('name').value.trim(),
+        tel=document.getElementById('tel').value.trim();
+    if(!name||!tel){ say('We need a name and a number to call you back.'); return; }
+    
+    if(!document.getElementById('agree').checked){ say('Please tick the consent box.'); return; }
+    ok.classList.remove('show');
+    var data={};
+    new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
+    if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+    fetch('https://api.web3forms.com/submit',{method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(data)})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d||d.success!==true) throw new Error('rejected');
+        f.hidden=true; done.hidden=false; done.focus();
+      })
+      .catch(function(){
+        if(btn){ btn.disabled=false; btn.textContent=label; }
+        say('The message did not go through. Please try again, or write to office@renta.am.');
+      });
+  });
+})();
+
 </script>
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is a house manager different from a housekeeper?", "acceptedAnswer": {"@type": "Answer", "text": "A housekeeper does the work herself. A house manager runs it: draws up the schedules, gives the staff their tasks, keeps the budget, hires contractors and checks the result. It is a management job, not a hands-on one."}}, {"@type": "Question", "name": "What does a house manager cost in Yerevan?", "acceptedAnswer": {"@type": "Answer", "text": "The salary sits above a housekeeper’s, because the work is managing staff and money. Our fee is worked out from that salary – 50&nbsp;% of one month, of which the client pays 25&nbsp;%. We will give you a range once we have talked about the house and the number of staff."}}, {"@type": "Question", "name": "Do we need a house manager if we only have two staff?", "acceptedAnswer": {"@type": "Answer", "text": "Usually not. Two people are easier to run yourself. The post starts to pay for itself at three staff and upwards. It also pays where there are contractors, more than one property, or real money going through the household budget."}}, {"@type": "Question", "name": "How quickly do you find someone?", "acceptedAnswer": {"@type": "Answer", "text": "First profiles come 3–5 days after the agreement is signed. The market for this post is small, so we would rather put two or three genuinely suitable people in front of you than ten at random."}}, {"@type": "Question", "name": "Is there a trial period?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, 5 days on the job. If the person does not suit, falls ill or the agreement ends, we find a replacement at no extra cost while the agreement runs."}}]}</script>

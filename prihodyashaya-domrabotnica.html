@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;600&display=swap">
 
-<link rel="stylesheet" href="assets/site.css?v=fd946a72">
+<link rel="stylesheet" href="assets/site.css?v=ce9b8e78">
 <style>.rowh{text-transform:none;font-size:.94rem;letter-spacing:0;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line)}</style>
 
 <a class="skip" href="#top">Перейти к содержимому</a>
@@ -222,11 +222,13 @@
       <li class="li"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span>Ереван, улица Маршала Бабаджаняна, 4/12</span></li>
     </ul>
   </div>
-  <form id="lead" action="/api/lead" method="post">
+  <form id="lead" action="https://api.web3forms.com/submit" method="post">
+    <input type="hidden" name="access_key" value="0d5151f7-aec5-4da9-a75c-bd2398af1238"><input type="hidden" name="subject" value="Renta — заявка с сайта: Приходящая домработница"><input type="hidden" name="from_name" value="Renta Staffing Agency"><input type="hidden" name="page" value="https://renta.am/prihodyashaya-domrabotnica.html"><input class="hp" type="text" name="botcheck" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="row2">
       <div class="field"><label for="name">Ваше имя</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Анна" required></div>
       <div class="field"><label for="tel">Телефон</label><input id="tel" name="tel" type="tel" autocomplete="tel" placeholder="+374 __ ___ ___" required></div>
     </div>
+    <div class="field"><label for="email">Почта</label><input id="email" name="email" type="email" autocomplete="email" placeholder="anna@example.com"></div>
     <div class="row2">
       <div class="field"><label for="format">Формат</label><select id="format" name="format">
             <option>1 раз в неделю</option>
@@ -238,10 +240,12 @@
       <div class="field"><label for="extra">Площадь квартиры</label><input id="extra" name="extra" type="text" placeholder="75 м², 3 комнаты"></div>
     </div>
     <div class="field"><label for="msg">Задача и график</label><textarea id="msg" name="msg" placeholder="Уборка по вторникам и пятницам, раз в месяц окна"></textarea></div>
-    <label class="consent"><input type="checkbox" id="agree" required><span>Согласен на обработку персональных данных для связи по заявке</span></label>
+    <label class="consent"><input type="checkbox" id="agree" name="consent" value="Да" required><span>Согласен на обработку персональных данных для связи по заявке</span></label>
     <button class="btn btn-primary" type="submit" style="width:100%">Отправить заявку</button>
+    <p class="form-note">Ответим в рабочее время. Данные уходят только нам.</p>
     <div class="ok" id="ok" role="status"></div>
   </form>
+  <div class="done" id="done" role="status" tabindex="-1" hidden><h3>Заявка принята</h3><p>Свяжемся в рабочее время. Если срочно — напишите на office@renta.am.</p></div>
 </div></section>
 </main>
 
@@ -274,7 +278,9 @@
       <li>Ереван, улица Маршала Бабаджаняна, 4/12</li>
     </ul></div>
   </div>
-  <div class="ftr-note"><span>© 2026 Renta Staffing Agency</span><span>Форма пока не отправляет заявку — обработчик подключается.</span></div>
+  <!-- Второй строки здесь больше нет: там стояло «форма пока не отправляет».
+       Формы отправляют, и оговорка стала неправдой. -->
+  <div class="ftr-note"><span>© 2026 Renta Staffing Agency</span></div>
 </div></footer>
 
 <script>
@@ -323,14 +329,39 @@
   if(bur&&mob){bur.addEventListener('click',function(){
     var on=mob.hidden; mob.hidden=!on; bur.setAttribute('aria-expanded',on); bur.classList.toggle('x',on);});}
 })();
-document.getElementById('lead').addEventListener('submit', function(e){
-  e.preventDefault();
-  var name=document.getElementById('name').value.trim(), tel=document.getElementById('tel').value.trim(), ok=document.getElementById('ok');
-  if(!name||!tel){ ok.textContent='Укажите имя и телефон — без них мы не сможем перезвонить.'; ok.classList.add('show'); return; }
-  if(!document.getElementById('agree').checked){ ok.textContent='Отметьте согласие на обработку данных.'; ok.classList.add('show'); return; }
-  ok.textContent=name+', заявка принята. Перезвоним в рабочее время. (Демо: форма никуда не отправляется.)';
-  ok.classList.add('show');
-});
+
+(function(){
+  var f=document.getElementById('lead');
+  if(!f) return;
+  var ok=document.getElementById('ok'), done=document.getElementById('done'),
+      btn=f.querySelector('button[type=submit]'), label=btn?btn.textContent:'';
+  function say(msg){ ok.textContent=msg; ok.classList.add('show'); }
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name=document.getElementById('name').value.trim(),
+        tel=document.getElementById('tel').value.trim();
+    if(!name||!tel){ say('Укажите имя и телефон — без них мы не сможем перезвонить.'); return; }
+    
+    if(!document.getElementById('agree').checked){ say('Отметьте согласие на обработку данных.'); return; }
+    ok.classList.remove('show');
+    var data={};
+    new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
+    if(btn){ btn.disabled=true; btn.textContent='Отправляем…'; }
+    fetch('https://api.web3forms.com/submit',{method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(data)})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d||d.success!==true) throw new Error('rejected');
+        f.hidden=true; done.hidden=false; done.focus();
+      })
+      .catch(function(){
+        if(btn){ btn.disabled=false; btn.textContent=label; }
+        say('Не получилось отправить. Попробуйте ещё раз или напишите на office@renta.am.');
+      });
+  });
+})();
+
 </script>
 
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Сколько стоит приходящая домработница в Ереване?", "acceptedAnswer": {"@type": "Answer", "text": "Оплата зависит от площади, частоты визитов и набора задач: обычная уборка стоит дешевле генеральной с окнами и коврами. Услуга агентства — 50&nbsp;% от месячного оклада специалиста, из них 25&nbsp;% платит заказчик. Точные цифры назовём после короткого разговора о доме и графике."}}, {"@type": "Question", "name": "Чем это лучше поиска по объявлениям?", "acceptedAnswer": {"@type": "Answer", "text": "Самостоятельный поиск несёт четыре риска: непрофессионализм (испорченные ткани, покрытия или техника, и компенсировать ущерб не с кого), ненадёжность (человек пропал без предупреждения), отсутствие проверки документов и рекомендаций и отсутствие договора. Агентство снимает эти риски и берёт ответственность на себя."}}, {"@type": "Question", "name": "Как часто она может приходить?", "acceptedAnswer": {"@type": "Answer", "text": "От одного раза в неделю до трёх. Возможны и разовые выезды — генеральная уборка или уборка после мероприятия. График согласовывается заранее и фиксируется в договоре."}}, {"@type": "Question", "name": "Что делать, если сотрудница заболела?", "acceptedAnswer": {"@type": "Answer", "text": "Мы предупреждаем заранее о любых изменениях графика и оперативно подбираем замену. В течение срока договора замены бесплатны — до трёх раз."}}, {"@type": "Question", "name": "Нужно ли покупать чистящие средства?", "acceptedAnswer": {"@type": "Answer", "text": "Обычно средства и инвентарь предоставляет заказчик — специалист подбирает подходящее под каждую поверхность. Если хотите, чтобы домработница закупала их сама, это отдельно оговаривается в договоре."}}]}</script>
