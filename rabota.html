@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;600&display=swap">
-<link rel="stylesheet" href="assets/site.css?v=ce9b8e78">
+<link rel="stylesheet" href="assets/site.css?v=a67864be">
 
 <a class="skip" href="#top">Перейти к содержимому</a>
 <header class="hdr"><div class="wrap hdr-in">
@@ -134,6 +134,19 @@
 
     <div class="fgroup"><span class="fgroup-h">О себе</span></div>
     <div class="field"><label for="msg">Что важно знать о вас</label><textarea id="msg" name="msg" placeholder="Опыт, семьи, в которых работали, привычки и пожелания к дому"></textarea></div>
+
+    <div class="field">
+      <span class="lbl">Фото</span>
+      <input class="photo-drop" type="file" id="photo" name="photo" accept="image/*"
+             aria-describedby="photo-hint">
+      <label class="photo-pick" for="photo">Выбрать фото</label>
+      <p class="f-hint" id="photo-hint">Не обязательно, но анкету с фото смотрят первой. Подойдёт обычный снимок, где вас хорошо видно.</p>
+      <div class="photo-prev" id="photo-prev" hidden>
+        <img class="photo-thumb" id="photo-thumb" alt="" width="72" height="72">
+        <span class="photo-name" id="photo-name"></span>
+        <button class="btn btn-ghost photo-rm" type="button" id="photo-rm">Убрать</button>
+      </div>
+    </div>
 
     <label class="consent"><input type="checkbox" id="agree" name="consent" value="Да" required><span>Согласен на обработку персональных данных согласно <a href="politika.html">политике</a></span></label>
     <button class="btn btn-primary btn-wide" type="submit">Отправить анкету</button>
@@ -252,6 +265,70 @@
   var ok=document.getElementById('ok'), done=document.getElementById('done'),
       btn=f.querySelector('button[type=submit]'), label=btn?btn.textContent:'';
   function say(msg){ ok.textContent=msg; ok.classList.add('show'); }
+
+  // ---- фотография: выбор, поворот, уменьшение, превью ----
+  var photoBlob=null, photoUrl=null;
+  (function(){
+    var inp=document.getElementById('photo');
+    if(!inp) return;
+    var prev=document.getElementById('photo-prev'),
+        thumb=document.getElementById('photo-thumb'),
+        nameEl=document.getElementById('photo-name'),
+        rm=document.getElementById('photo-rm');
+    var SIDE=1280, MAXIN=15*1024*1024, KEEP=5*1024*1024;
+    function clear(){
+      if(photoUrl){ URL.revokeObjectURL(photoUrl); photoUrl=null; }
+      photoBlob=null; prev.hidden=true; thumb.removeAttribute('src');
+      nameEl.textContent='';
+    }
+    function shown(blob,fname){
+      if(photoUrl) URL.revokeObjectURL(photoUrl);
+      photoBlob=blob; photoUrl=URL.createObjectURL(blob);
+      thumb.src=photoUrl; nameEl.textContent=fname; prev.hidden=false;
+    }
+    // Запасной путь для браузеров без createImageBitmap: там поворот из EXIF
+    // применяет сам <img>, поэтому на холст всё ложится так же.
+    function viaImg(file){
+      return new Promise(function(res,rej){
+        var u=URL.createObjectURL(file), im=new Image();
+        im.onload=function(){ URL.revokeObjectURL(u); res(im); };
+        im.onerror=function(){ URL.revokeObjectURL(u); rej(new Error('decode')); };
+        im.src=u;
+      });
+    }
+    function shrink(file){
+      return Promise.resolve().then(function(){
+        // imageOrientation:'from-image' — иначе снимок с телефона ляжет боком:
+        // поворот записан в EXIF, а не в самих пикселях.
+        return window.createImageBitmap
+          ? createImageBitmap(file,{imageOrientation:'from-image'})
+          : viaImg(file);
+      }).then(function(src){
+        var w=src.width||src.naturalWidth, h=src.height||src.naturalHeight,
+            k=Math.min(1, SIDE/Math.max(w,h)),      // Math.min(1,…) — не растягиваем мелкое
+            cw=Math.max(1,Math.round(w*k)), ch=Math.max(1,Math.round(h*k));
+        var c=document.createElement('canvas'); c.width=cw; c.height=ch;
+        c.getContext('2d').drawImage(src,0,0,cw,ch);
+        if(src.close) src.close();
+        return new Promise(function(res,rej){
+          c.toBlob(function(b){ b?res(b):rej(new Error('toBlob')); },'image/jpeg',0.82);
+        });
+      });
+    }
+    inp.addEventListener('change',function(){
+      var file=inp.files&&inp.files[0];
+      if(!file){ clear(); return; }
+      if(String(file.type).indexOf('image/')!==0){ say('Это не фотография. Нужен файл-картинка.'); inp.value=''; clear(); return; }
+      if(file.size>MAXIN){ say('Файл слишком большой. Выберите снимок полегче.'); inp.value=''; clear(); return; }
+      ok.classList.remove('show');
+      shrink(file).then(function(b){ shown(b,file.name); }).catch(function(){
+        // Ужать не вышло. Заявка важнее фотографии: небольшой файл шлём как есть,
+        // тяжёлый бросаем и даём анкете уйти без снимка.
+        if(file.size<=KEEP){ shown(file,file.name); } else { inp.value=''; clear(); }
+      });
+    });
+    rm.addEventListener('click',function(){ inp.value=''; clear(); inp.focus(); });
+  })();
   f.addEventListener('submit', function(e){
     e.preventDefault();
     var name=document.getElementById('name').value.trim(),
@@ -261,7 +338,11 @@
     if(!document.getElementById('agree').checked){ say('Отметьте согласие на обработку данных.'); return; }
     ok.classList.remove('show');
     var data={};
-    new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
+    new FormData(f).forEach(function(v,k){
+      // Файл в текстовые поля не кладём: у него значение «[object File]».
+      // Снимок уезжает отдельной частью запроса, ниже.
+      if(typeof File!=='undefined' && v instanceof File) return;
+      data[k]=(k in data)?(data[k]+', '+v):v; });
     // Читаемые строки для Телеграма: подписи берём из самой разметки, поэтому
     // они всегда совпадают с тем, что человек видел на экране, и переводятся
     // вместе со страницей. Без этого в заявке стояли бы q0, q1, q3 —
@@ -270,6 +351,7 @@
     Array.prototype.forEach.call(f.elements,function(el){
       var n=el.name;
       if(!n||el.disabled||el.type==='hidden'||el.type==='submit') return;
+      if(el.type==='file'){ if(photoBlob){ pretty.push('Фото: приложено'); } return; }
       if((el.type==='checkbox'||el.type==='radio')&&!el.checked) return;
       var v=(el.value||'').trim(); if(!v) return;
       if(el.type==='checkbox'&&n==='consent') v='да';
@@ -289,9 +371,18 @@
     });
     data.pretty=pretty.join('\n');
     if(btn){ btn.disabled=true; btn.textContent='Отправляем…'; }
-    fetch('/api/form',{method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(data)})
+    var send;
+    if(photoBlob){
+      var fd=new FormData();
+      Object.keys(data).forEach(function(k){ fd.append(k,data[k]); });
+      fd.append('photo',photoBlob,'anketa.jpg');
+      send=fetch('/api/form',{method:'POST',headers:{'Accept':'application/json'},body:fd});
+    }else{
+      send=fetch('/api/form',{method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify(data)});
+    }
+    send
       .then(function(r){ return r.json(); })
       .then(function(d){
         if(!d||d.success!==true) throw new Error('rejected');

@@ -356,6 +356,35 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 .consent input{width:24px;height:24px;margin:0;accent-color:var(--accent-btn);cursor:pointer}
 .ok{display:none;background:var(--accent-soft);border:1px solid var(--accent-btn);color:var(--accent-text);border-radius:10px;padding:14px 16px;font-size:.94rem}
 .ok.show{display:block}
+/* ---- фото соискателя (только анкета на rabota.html) ----
+   Само поле file уводим за край экрана, а не гасим display:none и не прячем
+   visibility:hidden: скрытое так поле выпадает из обхода клавиатурой, и до
+   выбора файла было бы не добраться иначе как мышью. Видимая кнопка — это
+   <label for="photo">, по нему браузер открывает выбор файла сам. */
+/* Селектор с именем тега обязателен. Правило .field input задаёт полям ширину,
+   и по весу оно сильнее одиночного класса: замерено — поле раздувалось до 1905 px
+   и, стоя абсолютом, растягивало страницу до 2889 px при экране 1920.
+   Плюс уводим за левый край: даже если ширина когда-нибудь снова протечёт,
+   на раскладку это уже не повлияет. */
+.field input.photo-drop{position:absolute;left:-9999px;top:auto;
+  width:1px;height:1px;min-width:0;padding:0;margin:0;border:0;
+  opacity:0;pointer-events:none}
+.photo-pick{display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:10px 22px;border-radius:999px;
+  border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);
+  font-size:.92rem;font-weight:600;line-height:1.25;cursor:pointer;width:fit-content;
+  transition:border-color .14s ease,color .14s ease}
+.photo-pick:hover{border-color:var(--accent-btn);color:var(--accent-text)}
+/* Кольцо фокуса рисуем на подписи: фокус стоит на спрятанном поле,
+   и без этого правила с клавиатуры не видно, где ты находишься. */
+.field input.photo-drop:focus-visible + .photo-pick{outline:2px solid var(--focus);outline-offset:3px}
+.photo-prev{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
+.photo-thumb{width:72px;height:72px;flex:none;border-radius:10px;
+  object-fit:cover;border:1px solid var(--line)}
+.photo-name{font-size:.88rem;color:var(--ink-2);word-break:break-all;
+  min-width:0;flex:1 1 8ch}
+.photo-rm{min-height:44px;height:44px;padding:0 18px;font-size:.9rem;flex:none}
+
 /* честная строка под кнопкой: что будет дальше */
 .form-note{font-size:.82rem;color:var(--ink-3);margin:0}
 /* подтверждение вместо формы, на той же странице */
