@@ -166,8 +166,8 @@
   </form></div>
   <div class="done" id="done" role="group" tabindex="-1" aria-labelledby="done-h" aria-describedby="done-p" hidden>
       <div class="done-in">
-        <div class="done-head"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg></span><h3 class="f-card-h" id="done-h">Анкета принята</h3></div>
-        <p class="done-lede" id="done-p">Прочитаем и&nbsp;ответим в&nbsp;рабочее время.</p>
+        <div class="done-head"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg></span><h3 class="f-card-h" id="done-h" data-lim="Ваша анкета уже у нас">Анкета принята</h3></div>
+        <p class="done-lede" id="done-p" data-lim="Мы прочитаем её и&nbsp;ответим в&nbsp;рабочее время.">Прочитаем и&nbsp;ответим в&nbsp;рабочее время.</p>
         <details class="done-part done-next" open><summary class="done-lbl">Что дальше<svg class="ic done-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9.5 6 6 6-6"/></svg></summary><ol class="done-steps"><li><span><b>Собеседование.</b> Встречаемся лично или онлайн: опыт, навыки, ожидания по зарплате.</span></li><li><span><b>Документы.</b> Паспорт, медицинская книжка, справка об отсутствии судимости, дипломы.</span></li><li><span><b>Рекомендации.</b> Связываемся с&nbsp;прежними работодателями&nbsp;— с&nbsp;вашего согласия.</span></li></ol></details>
         <div class="done-part"><p class="done-lbl">Если есть вопросы</p><div class="done-links"><a class="done-link" href="mailto:office@renta.am"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span><span>office@renta.am</span></a></div></div>
         <button class="btn btn-ghost done-again" type="button" id="done-again">Отправить ещё одну анкету</button>
@@ -312,8 +312,16 @@
 (function(){
   var f=document.getElementById('lead');
   if(!f) return;
+  // «С какого момента человек видит форму» — засекаем на старте скрипта, то
+  // есть когда страница уже прогружена. Разница до отправки едет в data.ft:
+  // сервер молча отбрасывает то, что заполнено быстрее трёх секунд, — так
+  // подписывается робот, не человек.
+  var readyAt=Date.now();
   var ok=document.getElementById('ok'), done=document.getElementById('done'),
       again=document.getElementById('done-again'),
+      doneH=document.getElementById('done-h'), doneP=document.getElementById('done-p'),
+      normH=doneH?doneH.textContent:'', normP=doneP?doneP.textContent:'',
+      limH=doneH?doneH.getAttribute('data-lim'):'', limP=doneP?doneP.getAttribute('data-lim'):'',
       card=f.closest('.fsplit-card'), front=f.closest('.f-front')||f,
       btn=f.querySelector('button[type=submit]'), label=btn?btn.innerHTML:'',
       sending=false, sayT=0;
@@ -346,15 +354,24 @@
   }
   // Форма не прячется, а гаснет в своей клетке: карточка держит её высоту,
   // раздел и липкая полоса слева не меняются (правило 17, «Экран после отправки»).
-  function finish(){
+  //
+  // limited — заявка сверх лимита (защита от флуда, тот же файл): каналы её
+  // не получили, но человек не должен догадаться, что что-то пошло не так.
+  // Меняются только заголовок и подзаголовок (на data-lim) и пропадает «Что
+  // дальше» — эти шаги про новую заявку, а не про уже отправленную. Контакты
+  // и кнопка «ещё раз» остаются как есть.
+  function finish(limited){
     front.inert=true;
     if(card) card.classList.add('is-done');
     done.hidden=false;
-    // «Что дальше» открыт, если экран «принято» помещается в окно под шапкой;
-    // иначе свёрнут в одну строку — нажатием открывается.
     var inn=done.querySelector('.done-in')||done, nx=done.querySelector('.done-next'),
         h=document.querySelector('.hdr');
-    if(nx){
+    if(doneH) doneH.textContent=limited?(limH||normH):normH;
+    if(doneP) doneP.textContent=limited?(limP||normP):normP;
+    if(nx) nx.hidden=!!limited;
+    // «Что дальше» открыт, если экран «принято» помещается в окно под шапкой;
+    // иначе свёрнут в одну строку — нажатием открывается.
+    if(!limited && nx){
       nx.open=true;
       nx.open=inn.getBoundingClientRect().height<=window.innerHeight-(h?h.getBoundingClientRect().height:0)-32;
     }
@@ -499,6 +516,7 @@
       else { seen[n]=pretty.length; pretty.push(q+sep+v); }
     });
     data.pretty=pretty.join('\n');
+    data.ft=Date.now()-readyAt;
     busy(true);
     var send;
     if(photoBlob){
@@ -516,7 +534,7 @@
       .then(function(d){
         if(!d||d.success!==true) throw new Error('rejected');
         busy(false);
-        finish();
+        finish(d.limited);
       })
       .catch(function(){
         busy(false);
