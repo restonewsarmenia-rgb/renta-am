@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&family=Golos+Text:wght@400;600&family=Caveat&display=swap">
 
-<link rel="stylesheet" href="assets/site.css?v=8ebeff27">
+<link rel="stylesheet" href="assets/site.css?v=2360e0a5">
 <style>.rowh{text-transform:none;font-size:.94rem;letter-spacing:0;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line)}</style>
 
 <a class="skip" href="#top">Перейти к содержимому</a>
@@ -230,6 +230,7 @@
   </div>
   </div></div></div>
   <div class="fsplit-card">
+    <div class="f-front">
     <p class="f-eyebrow">Заявка на подбор персонала</p>
     <h3 class="f-card-h">Расскажите нам, кого вы ищете</h3>
     <p class="f-card-lede">Чем подробнее вы опишете задачу, тем точнее мы подберём кандидатов.</p>
@@ -258,9 +259,18 @@
       <label class="consent"><input type="checkbox" id="agree" name="consent" value="Да" required><span>Даю согласие на обработку персональных данных согласно <a href="politika.html">политике</a></span></label>
       <button class="btn btn-primary btn-wide" type="submit">Отправить заявку<svg class="ic ic-btn" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5"/></svg></button>
       <p class="form-note">Мы свяжемся с вами в рабочее время и предложим подходящих кандидатов.</p>
-      <div class="ok" id="ok" role="status"></div>
+      <div class="ok" id="ok" role="alert"></div>
     </form>
-    <div class="done" id="done" role="status" tabindex="-1" hidden><h3>Заявка принята</h3><p>Свяжемся в рабочее время. Если срочно — напишите на office@renta.am.</p></div></div>
+    </div>
+    <div class="done" id="done" role="group" tabindex="-1" aria-labelledby="done-h" aria-describedby="done-p" hidden>
+      <div class="done-in">
+        <div class="done-head"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m4.5 12.5 5 5 10-11"/></svg></span><h3 class="f-card-h" id="done-h">Заявка принята</h3></div>
+        <p class="done-lede" id="done-p">Мы свяжемся с&nbsp;вами в&nbsp;рабочее время и&nbsp;предложим подходящих кандидатов.</p>
+        <details class="done-part done-next" open><summary class="done-lbl">Что дальше<svg class="ic done-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9.5 6 6 6-6"/></svg></summary><ol class="done-steps"><li><span><b>Согласование.</b> Формируем заказ, оформляем договор и&nbsp;проводим расчёт.</span></li><li><span><b>Подбор.</b> В&nbsp;течение 3–5 дней направляем анкеты 3–5 подходящих кандидатов.</span></li><li><span><b>Собеседование.</b> Организуем интервью по телефону, онлайн или лично.</span></li></ol></details>
+        <div class="done-part"><p class="done-lbl">Если срочно</p><div class="done-links"><a class="done-link" href="tel:+37441303395"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h3l1.5 4-2 1.4a12 12 0 0 0 6.1 6.1l1.4-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5Z"/></svg></span><span>+374&nbsp;41&nbsp;303&nbsp;395</span></a><a class="done-link" href="mailto:office@renta.am"><span class="f-bico"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span><span>office@renta.am</span></a></div></div>
+        <button class="btn btn-ghost done-again" type="button" id="done-again">Отправить ещё одну заявку</button>
+      </div>
+    </div></div>
 </div></section>
 
 </main>
@@ -350,16 +360,83 @@
   var f=document.getElementById('lead');
   if(!f) return;
   var ok=document.getElementById('ok'), done=document.getElementById('done'),
-      btn=f.querySelector('button[type=submit]'), label=btn?btn.textContent:'';
-  function say(msg){ ok.textContent=msg; ok.classList.add('show'); }
+      again=document.getElementById('done-again'),
+      card=f.closest('.fsplit-card'), front=f.closest('.f-front')||f,
+      btn=f.querySelector('button[type=submit]'), label=btn?btn.innerHTML:'',
+      sending=false, sayT=0;
+  // Липкая шапка закрывает верх окна, поэтому «в окне» считаем от её низа.
+  // Плавно — только если человек не просил убрать движение.
+  function reveal(el){
+    var h=document.querySelector('.hdr'),
+        top=(h?Math.max(0,h.getBoundingClientRect().bottom):0)+16,
+        bot=window.innerHeight-16, r=el.getBoundingClientRect(), d=0;
+    if(r.top<top) d=r.top-top; else if(r.bottom>bot) d=Math.min(r.bottom-bot,r.top-top);
+    if(d) window.scrollBy({top:d,behavior:(window.matchMedia&&
+      matchMedia('(prefers-reduced-motion: reduce)').matches)?'auto':'smooth'});
+  }
+  // Ошибка — role="alert": её объявляет сам показ. Тот же текст второй раз
+  // подряд программа чтения не повторит, поэтому сначала гасим, потом показываем.
+  function hush(){ clearTimeout(sayT); ok.classList.remove('show'); ok.textContent=''; }
+  function say(msg){
+    hush();
+    sayT=setTimeout(function(){ ok.textContent=msg; ok.classList.add('show'); reveal(ok); },60);
+  }
+  // Пока заявка в пути, кнопка выключена: aria-disabled, а не disabled —
+  // disabled выбрасывает с кнопки фокус, и после ошибки человек терял место.
+  // Второй submit гасит флаг sending. Кнопка возвращается целиком, со значком.
+  function busy(on){
+    sending=on;
+    if(on) f.setAttribute('aria-busy','true'); else f.removeAttribute('aria-busy');
+    if(!btn) return;
+    if(on){ btn.setAttribute('aria-disabled','true'); btn.textContent='Отправляем…'; }
+    else { btn.removeAttribute('aria-disabled'); btn.innerHTML=label; }
+  }
+  // Форма не прячется, а гаснет в своей клетке: карточка держит её высоту,
+  // раздел и липкая полоса слева не меняются (правило 17, «Экран после отправки»).
+  function finish(){
+    front.inert=true;
+    if(card) card.classList.add('is-done');
+    done.hidden=false;
+    // «Что дальше» открыт, если экран «принято» помещается в окно под шапкой;
+    // иначе свёрнут в одну строку — нажатием открывается.
+    var inn=done.querySelector('.done-in')||done, nx=done.querySelector('.done-next'),
+        h=document.querySelector('.hdr');
+    if(nx){
+      nx.open=true;
+      nx.open=inn.getBoundingClientRect().height<=window.innerHeight-(h?h.getBoundingClientRect().height:0)-32;
+    }
+    done.focus({preventScroll:true});
+    reveal(inn);
+  }
+  if(again) again.addEventListener('click',function(){
+    f.reset();
+    // После сброса браузер не шлёт change, а блоки вопросов анкеты и снимок
+    // слушают именно его: без этого остались бы открытый блок и старое превью.
+    ['prof','photo'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+    hush(); busy(false);
+    done.hidden=true;
+    if(card) card.classList.remove('is-done');
+    front.inert=false;
+    var first=null;
+    Array.prototype.some.call(f.elements,function(el){
+      if(el.type==='hidden'||el.disabled||el.tabIndex<0||el.tagName==='FIELDSET'||el.tagName==='BUTTON') return false;
+      first=el; return true;
+    });
+    if(first) first.focus({preventScroll:true});
+    reveal(front);
+  });
   f.addEventListener('submit', function(e){
     e.preventDefault();
+    if(sending) return;
     var name=document.getElementById('name').value.trim(),
         tel=document.getElementById('tel').value.trim();
     if(!name||!tel){ say('Укажите имя и телефон — без них мы не сможем перезвонить.'); return; }
     
     if(!document.getElementById('agree').checked){ say('Отметьте согласие на обработку данных.'); return; }
-    ok.classList.remove('show');
+    hush();
     var data={};
     new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
     // Код страны на макете стоит отдельной надписью слева от поля, а не вторым
@@ -400,17 +477,18 @@
       else { seen[n]=pretty.length; pretty.push(q+sep+v); }
     });
     data.pretty=pretty.join('\n');
-    if(btn){ btn.disabled=true; btn.textContent='Отправляем…'; }
+    busy(true);
     fetch('/api/form',{method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify(data)})
       .then(function(r){ return r.json(); })
       .then(function(d){
         if(!d||d.success!==true) throw new Error('rejected');
-        f.hidden=true; done.hidden=false; done.focus();
+        busy(false);
+        finish();
       })
       .catch(function(){
-        if(btn){ btn.disabled=false; btn.textContent=label; }
+        busy(false);
         say('Не получилось отправить. Попробуйте ещё раз или напишите на office@renta.am.');
       });
   });

@@ -734,7 +734,6 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 .fsplit-card .form-note,
 .fsplit-card .ok,
 .fsplit-card button[type=submit],
-.fsplit-card > .done,
 .fsplit-card .field:has(textarea),
 .fsplit-card .field:has(.chips),
 .fsplit-card .field:has(.seg){grid-column:1/-1}
@@ -1039,11 +1038,76 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 
 /* честная строка под кнопкой: что будет дальше */
 .form-note{font-size:.82rem;color:var(--ink-3);margin:0}
-/* подтверждение вместо формы, на той же странице */
-.done{background:var(--accent-soft);border:1px solid var(--accent-btn);border-radius:14px;padding:24px 22px}
-.done:focus{outline:2px solid var(--accent-btn);outline-offset:3px}
-.done h3{font-size:1.2rem;margin:0 0 8px;color:var(--ink)}
-.done p{margin:0;color:var(--ink-2);font-size:.96rem}
+/* ЭКРАН ПОСЛЕ ОТПРАВКИ — 11 сентября 2026, правило 17.
+   Было: форма пряталась (hidden), карточка съёживалась до плашки, раздел
+   терял до 1950 px, а левая полоса — она вынута из потока, высоту строке
+   задаёт карточка — вылезала за низ раздела, и overflow:clip резал выгоды
+   и подпись. Замер при 1920×1049: раздел 1243 → 517, карточка 994 → 268,
+   полоса ниже раздела на 268, страница прыгала вверх на 566.
+   Теперь форма (.f-front) и экран «принято» (.done) лежат в ОДНОЙ клетке
+   сетки карточки. После отправки форма не исчезает, а гаснет —
+   visibility:hidden плюс inert: высоту клетки она держит, но её не видно,
+   до неё не дойти ни мышью, ни клавиатурой, ни программой чтения.
+   Карточка той же высоты, раздел не меняется ни на пиксель. */
+.fsplit-card{display:grid;grid-template-columns:minmax(0,1fr)}
+.f-front,.fsplit-card > .done{grid-area:1/1;min-width:0}
+.fsplit-card.is-done > .f-front{visibility:hidden}
+/* Экран «принято» тянется на всю клетку, а его содержимое липнет под шапкой
+   на той же высоте, что верх левой полосы плюс поле карточки: форма высокая
+   (анкета — 2190 px при 1440), и где бы человек ни нажал «Отправить»,
+   ответ встаёт перед глазами без прокрутки. Отпускает у низа карточки. */
+.fsplit-card > .done{outline:0}
+.done-in{display:grid;gap:var(--sp-24);align-content:start;max-width:40rem;
+  border-radius:var(--sp-12)}
+.fsplit-card > .done:focus-visible .done-in{outline:2px solid var(--focus);outline-offset:var(--sp-8)}
+@media (min-width:1024px){
+  .done-in{position:sticky;top:calc(var(--hdr-h) + var(--sp-32))}
+}
+/* Ниже 1024 карточка стоит одна в колонке, и держать двухтысячную пустоту
+   незачем: форма снимается целиком, скрипт подкручивает экран «принято» в окно. */
+@media (max-width:1023px){
+  .fsplit-card.is-done > .f-front{display:none}
+}
+.done-head{display:grid;grid-template-columns:var(--m-bico) minmax(0,1fr);
+  gap:var(--sp-16);align-items:center}
+.done-head .f-card-h{margin:0}
+.done-lede{margin:0;color:var(--ink-2);font-size:.96rem;line-height:1.5}
+.done-part{display:grid;gap:var(--sp-12)}
+/* Подпись части — как надзаголовок карточки заявки: 12,5, прописные, разрядка. */
+.done-lbl{margin:0;font-size:var(--m-eyebrow);font-weight:400;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--accent-text)}
+/* «Что дальше» — раскрывающийся блок. Строка-кнопка высотой 44 (цель нажатия),
+   поэтому зазор до списка 4, а не 12: на глаз расстояние то же. Родной
+   треугольник снят, вместо него шеврон из иконотеки, повёрнут у открытого. */
+.done-next{gap:var(--sp-4)}
+.done-next > summary{display:flex;align-items:center;gap:var(--sp-8);min-height:44px;
+  cursor:pointer;list-style:none;width:max-content;max-width:100%}
+.done-next > summary::-webkit-details-marker{display:none}
+.done-chev{transition:transform .15s ease}
+.done-next[open] .done-chev{transform:rotate(180deg)}
+/* На телефоне зазоры экрана «принято» 16 вместо 24: при 390×740 он
+   выходил 641 px при 635 доступных под шапкой. */
+@media (max-width:480px){.done-in{gap:var(--sp-16)}}
+/* Номера — родные номера списка (::marker): программа чтения называет их
+   один раз. Цифра мелкая, поэтому --accent-text, а не яркий --accent (правило 2). */
+.done-steps{margin:0;padding:0 0 0 var(--sp-24);display:grid;gap:var(--sp-12)}
+.done-steps li{padding-left:var(--sp-4);color:var(--ink-2);font-size:.94rem;line-height:1.5}
+.done-steps li::marker{color:var(--accent-text);font-weight:600}
+.done-steps b{color:var(--ink);font-weight:600}
+.done-links{display:flex;flex-wrap:wrap;gap:var(--sp-8) var(--sp-24)}
+.done-link{display:inline-grid;grid-template-columns:var(--m-bico) minmax(0,auto);
+  gap:var(--sp-12);align-items:center;min-height:44px;min-width:0;max-width:100%;
+  color:var(--ink);font-weight:600;font-size:.96rem;text-decoration:none}
+.done-link span:last-child{overflow-wrap:anywhere}
+.done-link:hover span:last-child{color:var(--accent-text);text-decoration:underline}
+/* Кнопка белая, как поля и кнопки выбора в самой форме: прозрачная рамка
+   --line-strong на заливке карточки дала бы 2,96 при норме 3, на белом — 3,47. */
+.done-again{justify-self:start;height:auto;min-height:var(--m-btn-h);max-width:100%;
+  padding:var(--sp-8) var(--sp-24);text-align:center;background:var(--surface)}
+@media (max-width:480px){.done-again{justify-self:stretch}}
+/* Пока заявка в пути: кнопка не прыгает под мышью и не зовёт нажать ещё раз. */
+.btn[aria-disabled="true"]{cursor:progress}
+.btn-primary[aria-disabled="true"]:hover{transform:none;background:var(--accent-btn);border-color:var(--accent-btn)}
 /* Ловушка для роботов. Уводим за край экрана, а не display:none: часть роботов
    пропускает поля, скрытые полностью, и заполняет только видимые в разметке.
    Человеку поле не видно, с клавиатуры не достаётся (tabindex="-1"),
