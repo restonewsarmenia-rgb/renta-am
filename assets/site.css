@@ -32,6 +32,97 @@
   --stage-2:#EFE5E0;
   --stage-3:#E9DCD5;
   --stage-4:#8C6F65;        /* пол под ногами команды: переход от светлого к --deep */
+  /* Блоки заявки и анкеты (макеты 01 и 02). Контраст посчитан и проверен
+     замером на живой странице, числа — в отчёте по воротам. */
+  --f-circle:#FBE3D3;       /* кружок под иконкой выгоды: подложка, не текст */
+  /* Карточка формы почти не отличается от фона: Шеф 10 сентября 2026 —
+     «третий блок тоже не должен сильно отличаться от фона».
+     #F2ECE9 к --ground даёт 1,04 — внутри заданной вилки 1,03–1,10.
+     Она НЕМНОГО ТЕМНЕЕ фона, а не светлее, и это вынужденно: белое поле
+     ввода к белому же фону даёт всего 1,12, а Шеф просил не меньше 1,15.
+     Светлее фона карточку сделать и выдержать оба числа нельзя. */
+  --f-card:#F2ECE9;         /* заливка карточки формы, почти фон */
+  --f-ink-soft:#6E5C57;     /* подсказка под подписью, 5.71:1 на белом */
+  /* Цвет подписи поля в заявке — снят с макета форма/02.png кодом
+     (generator/maket_podpisi.py): сердцевина букв четырёх подписей, медиана —
+     #4C4E50, холодный тёмно-серый. К карточке #F2ECE9 даёт 7,14 — норму 4,5
+     проходит, поэтому взят как есть, а не подменён ближайшим токеном. */
+  --f-label:#4C4E50;
+  /* Чернила рукописной подписи — «как будто написала настоящая ручка»,
+     Шеф 11 сентября 2026. За основу взят цвет чернил эталона (57,58,60)
+     (замер форма/01.png): светлота та же, L* 24,4, а оттенок уведён
+     в холодную синеву — насыщенность 14, тон 274°. К фону колонки
+     #F6F1EF — 10,22:1, к белому 11,45:1 при норме 4,5.
+     ТОЛЬКО ДЛЯ ПОДПИСИ: никакой другой текст сайта этим токеном не красить. */
+  --sign-ink:#2E3A4F;
+  --f-req:#C0392B;          /* звёздочка обязательного поля, 5.09:1 на белом */
+  /* Тень очень мягкая и широкая: рамку у карточки сняли, и держать край
+     должна только она. Прежняя (18/48 при .10) читалась как контур. */
+  --f-shadow:0 40px 96px rgba(42,29,25,.07),0 6px 18px rgba(42,29,25,.035);
+  /* ===== Раздел формы: одна шкала отступов =====
+     Шеф отдельно потребовал идеально ровных внутренних отступов. Поэтому
+     все расстояния внутри раздела берутся только отсюда — ни одного числа
+     мимо шкалы. Проверяется generator/otstupy.js: он обходит раздел в живом
+     браузере, собирает все фактические зазоры и поля и сверяет со шкалой. */
+  --sp-4:4px;
+  --sp-8:8px;
+  --sp-12:12px;
+  --sp-16:16px;
+  --sp-24:24px;
+  --sp-32:32px;
+  --sp-40:40px;
+  --sp-48:48px;
+
+  /* ===== Размеры раздела =====
+     Решение о контейнере --maxw отменено Шефом: раздел берёт вес целой
+     страницы, полоса фото идёт от левого края экрана и она большая.
+     Карточка ограничена не контейнером, а читаемостью: строка ввода длиннее
+     420 px читается плохо, поэтому поля внутри стоят в два-три столбца. */
+  --m-photo:clamp(320px,30vw,560px);
+  --m-copy-max:520px;        /* лишнюю ширину забирает текст, дальше растёт зазор */
+  --m-copy-min:320px;
+  --m-card-max:min(52vw,820px);
+  --m-card-min:608px;        /* два столбца по 260 + зазор 16 + поля 64, с запасом */
+  --m-col-min:260px;         /* столбец полей: не уже 260 */
+  --m-col-max:420px;         /* и не шире 420 */
+  --m-field-h:44px;          /* цель нажатия; макет давал 38–41 */
+  --m-btn-h:44px;
+  --m-pick-h:44px;           /* кнопка выбора: высота по требованию Шефа */
+  --m-pick-radius:10px;      /* форма с макета: скруглённый прямоугольник, не пилюля */
+  --m-card-radius:22px;
+  --m-bico:44px;
+  --m-eyebrow:12.5px;        /* предел читаемости, правило 12 */
+  --m-h2:34px;
+  --m-h2-lh:40px;
+  --m-lede:15px;
+  --m-lede-lh:23px;
+  /* Кегль рукописной подписи здесь больше не живёт: подпись — SVG, её кегль
+     36,96 (+30 % к 28,43 варианта 6) и вся геометрия задаются в core.SIGN_FS /
+     SIGN_GEOM (вариант 6, выбран Шефом 11 сентября 2026). Прежние 34 px сняты. */
+  --m-inp-icon:38px;         /* поле справа под значок внутри поля */
+  /* Высота шапки замерена в браузере: полоса 72 плюс линия снизу 1.
+     Липкий снимок встаёт ровно под ней, а не подлезает под меню. */
+  --hdr-h:73px;
+  /* Вертикальное поле раздела. Оно же нужно градиенту полосы фото: колонка
+     кончается на 76 px выше края раздела, и без этой связи под градиентом
+     оставалась полоса фона. Замерено: снизу 76, сверху 77 (плюс линия). */
+  --sec-pad:76px;
+  /* Потолок формы полосы: высота не больше ширины × 1.8.
+     Файл вертикального среза — 900×1200, то есть 3:4, родное отношение
+     высота/ширина 1.33. При 1.8 в кадре остаётся 74 % ширины — плечи, руки
+     и полотенце целы. Дальше кадр превращается в щель: замерено до правки
+     11.49 на 1024, видно было 11.6 % ширины. */
+  --m-photo-k:1.8;
+  /* Растворение краёв снимка. Правый край уходит в фон широкой маской,
+     верх и низ — мягким сходом. Размытия нет: только прозрачность.
+     По ширине переход задан долей от полосы и заперт сверху и снизу:
+     200 px на узкой полосе (205 px на 1024) съели бы её почти целиком. */
+  --m-fade-x:clamp(96px,34%,200px);
+  --m-fade-y:56px;
+  /* Нижний предел высоты снимка на низком экране ноутбука. Взят через min
+     с потолком формы: на узкой полосе (1024: 205 px) ровные 420 дали бы
+     отношение 2.05 и порог Шефа «не больше 2,0» сорвался бы. */
+  --m-photo-min:420px;
   --focus:#F15808;
   --radius:14px;
   --maxw:1140px;
@@ -190,7 +281,7 @@ h1,h2,h3{hyphens:auto}
 }
 
 /* ============ SECTION ============ */
-.sec{padding:76px 0}
+.sec{padding:var(--sec-pad) 0}
 .sec-head{display:grid;gap:14px;margin-bottom:36px;max-width:66ch}
 @media (max-width:760px){.sec{padding:52px 0}}
 
@@ -369,21 +460,582 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 .field input.photo-drop{position:absolute;left:-9999px;top:auto;
   width:1px;height:1px;min-width:0;padding:0;margin:0;border:0;
   opacity:0;pointer-events:none}
-.photo-pick{display:inline-flex;align-items:center;justify-content:center;
-  min-height:44px;padding:10px 22px;border-radius:999px;
-  border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);
-  font-size:.92rem;font-weight:600;line-height:1.25;cursor:pointer;width:fit-content;
-  transition:border-color .14s ease,color .14s ease}
-.photo-pick:hover{border-color:var(--accent-btn);color:var(--accent-text)}
-/* Кольцо фокуса рисуем на подписи: фокус стоит на спрятанном поле,
-   и без этого правила с клавиатуры не видно, где ты находишься. */
-.field input.photo-drop:focus-visible + .photo-pick{outline:2px solid var(--focus);outline-offset:3px}
+/* Видимая кнопка выбора — коробка вложения .f-attach (см. ниже): по макету 01
+   это пунктирная рамка со скрепкой. Кольцо фокуса рисуем на ней, потому что
+   фокус стоит на спрятанном поле и иначе с клавиатуры не видно, где ты. */
 .photo-prev{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px}
 .photo-thumb{width:72px;height:72px;flex:none;border-radius:10px;
   object-fit:cover;border:1px solid var(--line)}
 .photo-name{font-size:.88rem;color:var(--ink-2);word-break:break-all;
   min-width:0;flex:1 1 8ch}
 .photo-rm{min-height:44px;height:44px;padding:0 18px;font-size:.9rem;flex:none}
+
+/* ============ БЛОКИ ЗАЯВКИ И АНКЕТЫ (макеты 01 и 02) ============
+   Один скелет на оба: фото полосой от левого края экрана, кремовая колонка
+   со словами, белая карточка с формой. Различаются только содержанием.
+
+   Полоса фото должна доходить до края экрана, а текст и карточка — стоять
+   в общей сетке страницы. Поэтому две вложенные сетки: внешняя делит экран
+   на «фото» и «остальное», внутренняя держит колонку текста и карточку
+   в пределах --maxw. Одной сеткой с отрицательными полями это не собрать:
+   на промежуточных ширинах поле уезжает за край. */
+/* overflow:clip, а не hidden. Любой hidden на предке делает из него окно
+   прокрутки, и position:sticky внутри приклеивается к этому окну — то есть
+   не работает вовсе. clip режет так же, но окна прокрутки не заводит.
+   Строку hidden оставляем первой: старый Safari clip не знает, возьмёт её
+   и получит прежнее поведение — снимок сверху полосы, без липкости. */
+.fsplit-sec{background:var(--ground);border-top:1px solid var(--line);
+  overflow:hidden;overflow:clip}
+/* Раздел во всю ширину экрана: полоса фото от левого края, за ней текст
+   и карточка. Третья дорожка — растущий зазор: текст добирает ширину до
+   своего предела 520, всё лишнее уходит в зазор, чтобы карточка не разъезжалась
+   и справа от неё оставалось поле страницы. */
+.fsplit{display:grid;padding:0 var(--sp-24) 0 0;
+  grid-template-columns:
+    var(--m-photo)
+    /* У текста тоже есть пол: без него карточка забирала максимум,
+       и колонка сжималась до 188 px. */
+    minmax(min(100%,var(--m-copy-min)),var(--m-copy-max))
+    minmax(var(--sp-32),1fr)
+    /* Карточке дан минимум: без него колонка текста забирала ширину первой,
+       карточка получала 432 px при 1440, и поля вставали в один столбец
+       вместо двух. Минимум 600 = два столбца по 260 плюс зазор 16 и поля 64. */
+    minmax(min(100%,var(--m-card-min)),var(--m-card-max))}
+.fsplit-rail{grid-column:1/3;position:relative}
+.fsplit-photo{grid-column:1}
+.fsplit-card{grid-column:4}
+
+/* ЛЕВАЯ ПОЛОСА ЛИПНЕТ ЦЕЛИКОМ — фото и текст вместе.
+   Шеф 10 сентября 2026: «средний блок должен остаться неподвижным, пока
+   крутишь до последней кнопки формы; все три блока ровны по высоте».
+   Раньше липнул только снимок, а текст уезжал вверх вместе со страницей.
+
+   Три коробки одна в другой, и каждая нужна:
+     .fsplit-rail — обычный элемент сетки на дорожках 1–2. Тянется во всю
+       высоту строки, но содержимое у него вынуто из потока, поэтому высоту
+       строки задаёт карточка, а не полоса. Без этого на высоком окне строка
+       росла под экран и карточка растягивалась пустотой (замерено 1440×1400).
+     .fsplit-pin — абсолютная коробка. Её верх и низ отбиты ровно на поля
+       карточки (--sp-48), поэтому липкая полоса трогается там же, где
+       начинается карточка, и отпускает ровно у её нижнего края.
+     .fsplit-stick — сама липкая полоса: две дорожки, снимок и текст,
+       высота в экран под шапкой.
+
+   Верх снимка, верх текста и верх карточки совпадают до пикселя: все трое
+   стоят на верхней кромке .fsplit-pin, у текста поле сверху снято. */
+.fsplit-pin{position:absolute;left:0;right:0;top:var(--sp-48);bottom:var(--sp-48)}
+/* Запасная строка с vh идёт первой, svh включается через @supports.
+   Замерено: в объявлении с var() внутри calc неизвестная единица делает
+   свойство недействительным на этапе вычисления, и оно не откатывается
+   к прошлой строке, а сбрасывается совсем — высота уходила в auto. */
+/* Высота полосы — НИЖНИЙ ПРЕДЕЛ, а не потолок (11 сентября 2026, вместе
+   с подписью варианта 6). Раньше стояло height: полоса ровно в экран, и на
+   низком окне колонка текста была длиннее её — хвост вываливался вниз,
+   а раздел со своим overflow:clip его резал. Замерено до правки: при окне
+   1200×700 английская главная теряла 49 px подписи; новая подпись выше
+   прежней на 17–34 px, и при 1366×657 (ноутбук 1366×768 за вычетом панелей
+   браузера) русская главная теряла уже 39 px, при 1280×610 — 103.
+   С min-height на высоком окне ничего не меняется (текст короче экрана,
+   полоса та же), а на низком полоса дорастает до текста: липнет верхом,
+   отпускает ровно у низа карточки, и подпись в конце видна целиком.
+   Строка сетки при этом — самое большое из «текст» и «экран»: снимок из
+   потока вынут (.fsplit-ph-pin ниже), своей высотой полосу не раздувает. */
+.fsplit-stick{position:sticky;top:var(--hdr-h);
+  min-height:min(100%,calc(100vh - var(--hdr-h)));
+  display:grid;grid-template-columns:var(--m-photo) minmax(0,1fr);
+  /* Одна строка во всю высоту: без неё проценты у снимка не от чего считать. */
+  grid-template-rows:minmax(0,1fr)}
+@supports (height:1svh){
+  /* Только svh: vh на телефоне считается без адресной строки (правило 8). */
+  .fsplit-stick{min-height:min(100%,calc(100svh - var(--hdr-h)))}
+}
+
+/* СНИМОК СТАНОВИТСЯ ЧАСТЬЮ ФОНА.
+   Шеф: «фото не должно отличаться от фона, как будто из фона».
+   Слева кадр упирается в край экрана, справа растворяется широкой маской,
+   сверху и снизу — мягким сходом. Размытием края не делаем: выглядит дёшево.
+   Фирменной подложки под кадром больше нет: если кадр растворяется,
+   подложка не нужна, под ним просто фон раздела.
+
+   Высота снимка по-прежнему заперта потолком формы --m-photo-k, иначе
+   в полосу высотою в экран попадала бы вертикальная щель. */
+/* Внутри снимка ещё одна коробка. От 1200 она просто передаёт высоту полосы,
+   а ниже 1200, где полосы нет, становится абсолютной и даёт кадру готовую
+   высоту колонки: без неё проценты не от чего считать, и снимок опять
+   растягивался на всю высоту раздела — 205×2351 на 1024, отношение 11,48. */
+
+/* РАСТВОРЕНИЕ ДЕЛАЕТ НАКЛАДКА, А НЕ МАСКА. МАСОК В РАЗДЕЛЕ БОЛЬШЕ НЕТ.
+
+   История, чтобы это не вернулось. Сначала растворение было собрано из двух
+   слоёв маски на самой картинке и сведено mask-composite:intersect. На
+   клиентском блоке кадра не стало совсем: пустое поле в 560 px на главной,
+   двадцати одной услуге, контактах и о нас. Дальше по шагам, снимками экрана:
+     · маска в один слой — кадр виден, два слоя — нет, при любом ключевом
+       слове композиции (проверено add, intersect);
+     · разнёс слои по <img> и <picture> — на клиентском блоке всё равно пусто;
+     · снял маску с <img>, оставив на <picture>, — кадр появился;
+     · перенёс обе маски на обёртки, картинку оставил чистой — на главной
+       заработало, а пустым стал блок соискателя;
+     · и вот это решило: на пустой странице тронул transform у картинки
+       и вернул назад, НЕ трогая масок, — кадр появился.
+   Значит дело не в масках как таковых, а в перерисовке: у картинки стоит
+   decoding="async" и fetchpriority="low", раздел лежит внизу страницы, и
+   картинка доходит ПОЗЖЕ, чем нарисован слой с маской. Слой не признаётся
+   устаревшим и остаётся пустым. Какая из двух страниц окажется пустой —
+   дело случая, потому и «на анкете работает» было временным.
+
+   Поэтому масок нет вовсе. Тот же переход рисует накладка --ground поверх
+   снимка: фон под полосой ровный, и накладка даёт пиксель в пиксель то же,
+   что давала маска. Арифметика: маска out = снимок·a + фон·(1−a),
+   накладка out = фон·o + снимок·(1−o) при o = 1−a — одно и то же.
+   Два слоя накладки складываются обычным source-over: o = 1−(1−o₁)(1−o₂),
+   то есть ровно пересечение прозрачностей, которое давали две маски.
+   Картинка при этом рисуется как любая другая на сайте, и класс ошибки уходит.
+
+   В накладке доли записаны через color-mix от --ground: если Шеф поменяет
+   фон, переход поедет за ним сам. Прозрачность идёт не по прямой, а по
+   сглаженной ступени (3t² − 2t³, узлы 0 / 15,6 / 50 / 84,4 / 100 %): у прямой
+   на самом краю остаётся наклон, и это и есть та «ступенька», которую видно
+   глазом. Замерено: у правого края перепад между соседними столбцами падает
+   с 1,21 до 0,66 из 255. */
+/* Коробка снимка вынута из потока и на полосе (от 1200): иначе картинка
+   своей природной высотой (560×747 на 1920) сама растила бы строку полосы,
+   когда та перестала быть жёсткой. Ниже 1024 снова static — там полоса
+   сверху во всю ширину. */
+.fsplit-photo{position:relative}
+.fsplit-ph-pin{display:block;position:absolute;inset:0}
+.fsplit-photo picture{display:block;position:relative;
+  height:min(100%,calc(100vh - var(--hdr-h)),calc(var(--m-photo) * var(--m-photo-k)));
+  min-height:min(var(--m-photo-min),calc(var(--m-photo) * var(--m-photo-k)))}
+@supports (height:1svh){
+  /* Только svh: vh на телефоне считается без адресной строки (правило 8). */
+  .fsplit-photo picture{
+    height:min(100%,calc(100svh - var(--hdr-h)),calc(var(--m-photo) * var(--m-photo-k)))}
+}
+.fsplit-photo picture::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,
+      transparent calc(100% - var(--m-fade-x)),
+      color-mix(in srgb,var(--ground) 15.6%,transparent) calc(100% - var(--m-fade-x) * .75),
+      color-mix(in srgb,var(--ground) 50%,transparent) calc(100% - var(--m-fade-x) * .5),
+      color-mix(in srgb,var(--ground) 84.4%,transparent) calc(100% - var(--m-fade-x) * .25),
+      var(--ground) 100%),
+    linear-gradient(180deg,
+      var(--ground) 0,
+      color-mix(in srgb,var(--ground) 84.4%,transparent) calc(var(--m-fade-y) * .25),
+      color-mix(in srgb,var(--ground) 50%,transparent) calc(var(--m-fade-y) * .5),
+      color-mix(in srgb,var(--ground) 15.6%,transparent) calc(var(--m-fade-y) * .75),
+      transparent var(--m-fade-y),
+      transparent calc(100% - var(--m-fade-y)),
+      color-mix(in srgb,var(--ground) 15.6%,transparent) calc(100% - var(--m-fade-y) * .75),
+      color-mix(in srgb,var(--ground) 50%,transparent) calc(100% - var(--m-fade-y) * .5),
+      color-mix(in srgb,var(--ground) 84.4%,transparent) calc(100% - var(--m-fade-y) * .25),
+      var(--ground) 100%)}
+/* На картинке ни маски, ни накладки — она рисуется как любая другая. */
+.fsplit-photo img{display:block;width:100%;height:100%;
+  object-fit:cover;object-position:50% 22%}
+
+/* ---- кремовая колонка ---- */
+/* Поля сверху нет: текст стоит на той же линии, что снимок и карточка.
+   Вертикальный отступ раздела даёт .fsplit-pin. */
+.fsplit-copy{grid-column:2;display:grid;gap:var(--sp-24);align-content:start;min-width:0;
+  padding:0;margin-left:var(--sp-40)}
+.f-eyebrow{display:flex;align-items:center;gap:var(--sp-12);margin:0;
+  font-size:var(--m-eyebrow);font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-text)}
+.f-eyebrow::after{content:"";flex:1;height:1px;background:var(--line);max-width:120px}
+.fsplit-copy h2{font-size:var(--m-h2);line-height:calc(var(--m-h2-lh) / var(--m-h2))}
+.fsplit-copy .lede{font-size:var(--m-lede);line-height:calc(var(--m-lede-lh) / var(--m-lede));
+  max-width:none}
+
+/* ---- выгоды ---- */
+.f-benefits{display:grid;gap:var(--sp-24);margin:0}
+.f-benefit{display:grid;grid-template-columns:var(--m-bico) minmax(0,1fr);
+  gap:var(--sp-16);align-items:center}
+.f-bico{width:var(--m-bico);height:var(--m-bico);flex:none;border-radius:50%;
+  background:var(--f-circle);display:inline-flex;align-items:center;justify-content:center}
+.f-btext{display:grid;gap:var(--sp-4);min-width:0}
+.f-btext b{font-weight:600;line-height:1.3;font-size:15px}
+.f-btext span{color:var(--ink-2);font-size:13px;line-height:1.4}
+
+/* ---- рукописная подпись — вариант 6 ----
+   Выбран Шефом 11 сентября 2026 со страницы demo/proba/podpis-varianty.html:
+   Caveat (кегль 28,43, с 11 сентября — 36,96), строка с наклоном вверх вправо (12,6° у соискателя,
+   15,2° у заказчика — сняты с эталонов 01 и 02), вторая строка сдвинута
+   вправо, под последней строкой — дуга-росчерк Безье с переменной
+   толщиной, длина 1,06 и 1,26 последней строки. Буквы — своим курсивом
+   Caveat, искусственного наклона глифов нет: повёрнута строка, а не буквы.
+   Вся подпись — один SVG из core.sign_html(), геометрия там же.
+
+   Сверху 32: колонка даёт свои 24 из общей сетки, плюс 8 здесь. Снизу 32 —
+   то же поле, что у карточки формы.
+
+   ОТ ЛЕВОГО КРАЯ КОЛОНКИ — Шеф 11 сентября 2026 провёл красную черту по
+   левому краю колонки, где начинаются заголовок, лид и кружки иконок;
+   по центру подпись «ходила» относительно этой черты. Центровка снята.
+   Левый край SVG — это самая левая точка чернил первой строки после
+   поворота (core.sign_html считает габарит по чернилам, слева запаса 0),
+   поэтому flex-start ставит на черту именно чернила, а не коробку.
+
+   Кегль 36,96 (+30 % к варианту 6). width и height у SVG — его натуральный
+   размер; max-width:100% и height:auto ужимают подпись целиком там, где
+   колонка уже неё, — от левого края, так что чернила остаются на черте.
+   За колонку подпись не выходит нигде: это жёстче, чем кегль. */
+.f-sign{margin:var(--sp-8) 0 0;padding-bottom:var(--sp-32);max-width:100%;
+  display:flex;justify-content:flex-start}
+.f-sign-svg{display:block;max-width:100%;height:auto;overflow:visible}
+.f-sign-svg text{font-family:Caveat,"Segoe Script","Comic Sans MS",cursive;
+  font-style:normal;fill:var(--sign-ink)}
+/* Росчерк оранжевый — держит связь с брендом. --accent-btn, а не яркий
+   --accent: тон ближе к росчерку эталона (222,84,20) и (215,84,25). */
+.f-sign-svg .f-sign-sw{fill:var(--accent-btn)}
+
+/* ---- карточка формы ----
+   Шеф 10 сентября 2026: «третий блок тоже не должен сильно отличаться
+   от фона, форма должна выглядеть очень профессионально». Поэтому заливка
+   почти как фон (1,04 к --ground), рамки нет совсем, край держит только
+   очень мягкая широкая тень. Белыми остаются сами поля ввода — форма
+   читается как часть страницы, а не как наклейка сверху.
+   Поля стоят в два-три столбца: строка ввода длиннее 420 px читается плохо.
+   Число столбцов складывается само — auto-fit по минимуму 260. */
+.fsplit-card{background:var(--f-card);border:0;
+  border-radius:var(--m-card-radius);padding:var(--sp-32);
+  box-shadow:var(--f-shadow);min-width:0;margin:var(--sp-48) 0;
+  container-type:inline-size}
+.f-card-h{font-family:Literata,Georgia,"Times New Roman",serif;font-weight:600;
+  font-size:clamp(1.35rem,1.1rem + .9vw,1.75rem);line-height:1.18;margin:var(--sp-8) 0 0;
+  color:var(--ink)}
+.f-card-lede{color:var(--ink-2);font-size:.96rem;margin:var(--sp-8) 0 0;max-width:60ch}
+/* min(100%, 260) вместо голых 260: на 320 внутри карточки остаётся 241 px,
+   и auto-fit всё равно ставил столбец в 260 — поля торчали из карточки
+   на 20 px и упирались в край экрана (замерено на обоих языках, 11 кнопок
+   выбора). Выше 480 ничего не меняется: там 100 % всегда больше 260. */
+.fsplit-card form{display:grid;margin-top:var(--sp-24);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--m-col-min)),1fr));
+  gap:var(--sp-24) var(--sp-16);align-items:start;
+  background:none;border:0;border-radius:0;padding:0}
+/* В ЗАЯВКЕ СТОЛБЦОВ НЕ БОЛЬШЕ ДВУХ. Поля там идут парами (.row2): имя
+   с телефоном, почта с мессенджером. Замерено: на 1185–1199 карточка
+   заявки добирала ширину на три столбца по 260, и пары рвались — имя,
+   телефон и почта вставали в один ряд, а мессенджер оставался один
+   с двумя пустыми клетками справа. Нижний предел столбца max(260, половина
+   минус зазор) пускает третий столбец только туда, где его нет места:
+   ниже порога всё как было, на 1199 два столбца по 404 — внутри
+   заданных Шефом 260–420. Анкета не тронута: там своя раскладка. */
+.fsplit-client .fsplit-card form{
+  grid-template-columns:repeat(auto-fit,
+    minmax(max(min(100%,var(--m-col-min)),calc(50% - var(--sp-8))),1fr))}
+/* .row2 растворяется: его дети встают прямо в сетку карточки, и столбцы
+   складываются по всей форме, а не по два внутри каждого ряда. */
+.fsplit-card .row2{display:contents}
+.fsplit-card .f-pane,
+.fsplit-card .f-hint,
+.fsplit-card .consent,
+.fsplit-card .form-note,
+.fsplit-card .ok,
+.fsplit-card button[type=submit],
+.fsplit-card > .done,
+.fsplit-card .field:has(textarea),
+.fsplit-card .field:has(.chips),
+.fsplit-card .field:has(.seg){grid-column:1/-1}
+.fsplit-card .field{gap:var(--sp-8)}
+/* Общий .f-hint несёт margin:-4px 0 2px — из-за него зазор до первого раздела
+   выходил 26 px вместо 24. Внутри раздела отступы задаёт только сетка. */
+.fsplit-sec .f-hint{margin:0}
+/* Мелкий текст на карточке переведён с --ink-3 на --f-ink-soft: на новой
+   заливке #F2ECE9 первый даёт 4,42 — ниже нормы 4,5, второй 5,39.
+   Звёздочка обязательного поля с --accent-btn (4,33) на --accent-text (4,81).
+   Префикс телефона получает ту же рамку, что и поле, иначе слева у трубки
+   рамка 1,43, а справа 3,47. */
+.fsplit-sec .f-hint,.fsplit-sec .form-note,.fsplit-sec .f-step{color:var(--f-ink-soft)}
+.fsplit-sec .f-req{color:var(--accent-text)}
+.fsplit-sec .f-tel-pre{border-color:var(--line-strong);background:var(--surface)}
+/* Поля белые на почти-фоновой карточке: 1,17 к её заливке при требовании
+   Шефа не меньше 1,15. Рамка --line-strong даёт 3,47 к белому при требовании
+   не меньше 3,0 — прежняя --line давала 1,43 и границы поля попросту не было. */
+.fsplit-card .field input,.fsplit-card .field select,.fsplit-card .field textarea{
+  background:var(--surface);border-color:var(--line-strong);
+  min-height:var(--m-field-h);padding-block:0}
+.fsplit-card .field textarea{padding-block:var(--sp-12);min-height:calc(var(--m-field-h) * 2.4)}
+.fsplit-card ::placeholder{color:var(--f-ink-soft);opacity:1}
+/* Подписи полей на макете обычные строчные и тёмные, а не прописные вразрядку.
+   Прописные остаются только у надзаголовков блоков. Правило заперто внутри
+   .fsplit-sec: за его пределами прежние подписи целы. */
+.fsplit-sec .field > label,
+.fsplit-sec .field > .lbl,
+.fsplit-sec .fgroup .fgroup-h{
+  text-transform:none;letter-spacing:normal;font-size:.9rem;font-weight:600;color:var(--ink)}
+/* Звёздочка обязательного поля привязана к последнему слову неразрывным
+   пробелом (core.req), иначе срывается на строку под подписью. */
+.f-req{color:var(--accent-btn);font-weight:inherit}
+.ic-btn{stroke:currentColor}
+
+/* ---- ПОДПИСИ ПОЛЕЙ И НАДЗАГОЛОВКИ В ЗАЯВКЕ — ОДИН В ОДИН С МАКЕТОМ ----
+   Шеф 11 сентября 2026: «подписи полей один в один с макетом». Числа сняты
+   кодом с форма/02.png (generator/maket_podpisi.py, пересчёт к ширине 1440),
+   таблица макет / сайт — в правиле 17. Правила заперты в .fsplit-client:
+   анкету соискателя в этой правке не трогали.
+
+   Подпись поля: на макете прописная 8,4 px, штрих 1 px — это Golos 400,
+   а не 600 (у 600 при том же кегле штрих 2 px), разрядки нет, цвет —
+   холодный серый #4C4E50. Кегль 12,5 вместо снятых 12,0: ниже 12,5 сайт
+   не опускается нигде (правило 12), разница 0,5 — в допуске.
+   Высота строки 1,47 подобрана так, чтобы от базовой линии подписи до верхней
+   рамки поля вышло столько же, сколько на макете, — 12,2 px, — а сам зазор
+   подпись → поле остался из шкалы, 8. */
+.fsplit-client .field > label,
+.fsplit-client .field > .lbl{
+  font-size:var(--m-eyebrow);font-weight:400;letter-spacing:0;line-height:1.47;
+  color:var(--f-label)}
+/* Звёздочка: на макете (207,80,43) — к нашей карточке 3,71, норму не проходит.
+   Ближайший проходящий токен по ΔE — --accent-text (ΔE 10,4, контраст 4,81);
+   --f-req отстаёт на волос (10,5) и даёт меньше, 4,65.
+   На макете она мельче знака шрифта: высота 3,7 px, верх вровень с верхом
+   прописной. У Golos «*» при кегле подписи 5,1 px — за допуском. Поэтому
+   0,8 кегля (4,1 px) и подъём на 0,12 em, чтобы верх остался на линии
+   прописных. Зазор от буквы по чернилам 4,1 при 4,7 на макете. */
+.fsplit-client .f-req{color:var(--accent-text);font-size:.8em;vertical-align:.12em}
+
+/* Надзаголовки. На макете прописная 7,5 px — кегль 10,7; сайт держит 12,5
+   (правило 12, ниже нельзя), поэтому разрядка задана в em и сохраняет
+   пропорцию макета: 0,13 em у карточки, 0,14 em у колонки. Вес 400:
+   штрих на макете 1 px, как у Golos 400. */
+.fsplit-client .fsplit-card .f-eyebrow{font-weight:400;letter-spacing:.13em;
+  color:var(--accent-text)}
+/* У надзаголовка карточки на макете линейки нет — снимаем. */
+.fsplit-client .fsplit-card .f-eyebrow::after{content:none}
+/* Надзаголовок колонки: на макете (199,155,130) — к фону 2,22. Ближайший
+   проходящий токен по ΔE — --ink-3 (ΔE 26,6, контраст 4,71).
+   Линейка: длина 76,7, толщина 0,94, зазор от чернил 15,0, цвет --line —
+   всё снято с макета. Зазор 14 (от чернил выходит 14,4) — единственное
+   число вне шкалы 4/8/12/16 в разделе: это расстояние внутри
+   типографской строки, а не отступ между блоками, а 16 от макета
+   ушло бы за допуск Шефа ±1. */
+/* Текст надзаголовка в одну строку, а линейка уступает место: на макете
+   колонка шире, и при 1440 (колонка 285) жёсткие 76 px заставляли
+   «ДЛЯ ЧАСТНЫХ КЛИЕНТОВ» переноситься на две строки — замерено. Поэтому
+   линейка 76, пока помещается, и ужимается до 24, когда нет. */
+.fsplit-client .fsplit-copy .f-eyebrow{font-weight:400;letter-spacing:.14em;
+  color:var(--ink-3);gap:14px;white-space:nowrap}
+.fsplit-client .fsplit-copy .f-eyebrow::after{flex:0 1 76px;min-width:24px;max-width:76px;
+  height:1px;background:var(--line)}
+
+/* Подсказка под полем бюджета. В placeholder она не помещалась (309 px
+   против 211–304), поэтому стоит строкой под полем и видна всегда, в том
+   числе когда сумма уже набрана. Зазор от поля — 8 из шкалы (его даёт
+   сетка .field), кегль — нижний предел 12,5, цвет — тот же, что у прочего
+   мелкого текста на карточке (5,39 к её заливке). */
+.fsplit-client .f-help{margin:0;font-size:var(--m-eyebrow);line-height:1.4;
+  color:var(--f-ink-soft)}
+
+/* ---- значок внутри поля ---- */
+.f-inp{position:relative;display:block}
+.f-inp > input,.f-inp > select{width:100%;padding-right:var(--m-inp-icon)}
+.f-inp-ic{position:absolute;right:var(--sp-12);top:50%;transform:translateY(-50%);
+  pointer-events:none;stroke:var(--ink-3)}
+.fsplit-sec .field select{appearance:none;-webkit-appearance:none;background-image:none}
+
+/* ---- ОДИН СТИЛЬ КНОПКИ НА ВСЕ ВЫБОРЫ РАЗДЕЛА ----
+   Шеф отметил стрелками прежние кнопки-галочки с пустым квадратом сбоку:
+   квадрат убран совсем. Теперь и множественный выбор (.chip), и одиночный
+   (.seg) выглядят одинаково — как «Полная занятость» на макете 01.
+   Настоящий input остаётся и не прячется display:none: он лежит под кнопкой
+   размером в неё, поэтому фокус с клавиатуры виден кольцом на самой кнопке,
+   пробел переключает, читалка называет состояние.
+   Селектор заперт внутри .fsplit-sec — на остальных страницах прежний вид. */
+.fsplit-sec .chip,.fsplit-sec .seg-btn{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  min-height:var(--m-pick-h);height:var(--m-pick-h);padding:0 var(--sp-16);
+  border:1px solid var(--line-strong);border-radius:var(--m-pick-radius);
+  /* Невыбранная кнопка белая, как поле ввода, а не цвета карточки:
+     правило 17, «белая заливка, рамка 1 px». */
+  background:var(--surface);color:var(--ink);
+  font-size:.9rem;line-height:1.2;white-space:nowrap;cursor:pointer;margin:0;
+  transition:background .14s ease,color .14s ease,border-color .14s ease}
+.fsplit-sec .chip input,.fsplit-sec .seg-btn input{
+  position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;
+  appearance:none;-webkit-appearance:none;border:0;background:none;cursor:pointer}
+.fsplit-sec .chip:hover,.fsplit-sec .seg-btn:hover{border-color:var(--accent-btn);color:var(--accent-text)}
+.fsplit-sec .chip:has(input:checked),.fsplit-sec .seg-btn:has(input:checked){
+  background:var(--accent-btn);border-color:var(--accent-btn);color:#fff;font-weight:600}
+.fsplit-sec .chip:has(input:focus-visible),.fsplit-sec .seg-btn:has(input:focus-visible){
+  outline:2px solid var(--focus);outline-offset:2px}
+.fsplit-sec .chips,.fsplit-sec .seg{display:flex;flex-wrap:wrap;gap:var(--sp-8);width:auto}
+.fsplit-sec .chip span,.fsplit-sec .seg-btn span{pointer-events:none}
+
+/* ---- поле телефона с постоянным кодом страны ---- */
+.f-tel{display:flex;align-items:stretch}
+.f-tel-pre{display:inline-flex;align-items:center;padding:0 var(--sp-12);flex:none;
+  border:1px solid var(--line);border-right:0;border-radius:10px 0 0 10px;
+  background:var(--surface-2);color:var(--ink-2);font-size:.98rem;
+  /* дальше внутри раздела рамку подхватывает --line-strong, см. ниже */
+  font-variant-numeric:tabular-nums}
+.f-tel input{border-radius:0 10px 10px 0}
+
+/* ---- согласие: коробочка 22 px, цель нажатия 44 ---- */
+.fsplit-sec .consent{display:grid;grid-template-columns:44px minmax(0,1fr);
+  gap:var(--sp-8);align-items:center;min-height:44px;font-size:.9rem;color:var(--ink)}
+/* Видимая коробочка 22 px, как просил Шеф, а нажимается 44: поле занимает
+   44x44 прозрачным, а квадратик рисуется фоном по центру. Отрицательное поле
+   слева возвращает текст на место, чтобы ряд не разъезжался. */
+.fsplit-sec .consent input{appearance:none;-webkit-appearance:none;
+  width:44px;height:44px;flex:none;margin:0;border:0;background-color:transparent;cursor:pointer;
+  background-repeat:no-repeat;background-position:center;background-size:22px 22px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Crect x='.5' y='.5' width='21' height='21' rx='5.5' fill='%23FFFFFF' stroke='%239C857C'/%3E%3C/svg%3E")}
+.fsplit-sec .consent input:checked{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Crect width='22' height='22' rx='6' fill='%23C34405'/%3E%3Cpath d='m5.5 11.5 4 4 7-8' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.fsplit-sec .consent input:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+
+/* ---- шаги ---- */
+.f-steps{margin:0 0 var(--sp-24)}
+.f-steps ol{display:flex;align-items:center;gap:var(--sp-8);margin:0;padding:0;flex-wrap:wrap}
+.f-step{display:flex;align-items:center;color:var(--ink-3);font-size:.9rem;line-height:1.2}
+.f-stepl{display:flex;align-items:center;gap:var(--sp-8);min-height:44px;
+  text-decoration:none;color:inherit}
+.f-stepn{width:30px;height:30px;flex:none;border-radius:50%;border:1px solid var(--line-strong);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:.86rem;font-weight:600;font-variant-numeric:tabular-nums}
+.f-step[aria-current]{color:var(--accent-text);font-weight:600}
+.f-step[aria-current] .f-stepn{background:var(--accent-btn);border-color:var(--accent-btn);color:#fff}
+.f-steps li + li::before{content:"";width:18px;height:1px;background:var(--line);
+  flex:none;margin-right:var(--sp-8)}
+.f-steps li{display:flex;align-items:center;min-width:0}
+@container (max-width:531px){
+  .f-step:not([aria-current]) .f-stept{display:none}
+}
+
+/* fieldset без сброса ломает сетку: ширина по содержимому. */
+.f-pane{border:0;margin:0;padding:0;min-inline-size:0;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--m-col-min)),1fr));
+  gap:var(--sp-24) var(--sp-16);align-items:start}
+.f-pane > .f-pane-h,.f-pane > #qsets,.f-pane > .field:has(textarea),
+.f-pane > .field:has(.chips),.f-pane > .consent{grid-column:1/-1}
+.f-pane-h{font-family:Literata,Georgia,serif;font-size:1.12rem;font-weight:600;
+  line-height:1.25;color:var(--ink);padding:0;margin:0}
+#qsets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--m-col-min)),1fr));
+  gap:var(--sp-24) var(--sp-16)}
+#qsets:not(:has(.qset:not([hidden]))){display:none}
+.qset{display:contents}
+.qset > .field:has(.chips){grid-column:1/-1}
+
+/* ---- коробка вложения ---- */
+.f-attach{display:flex;align-items:center;gap:var(--sp-16);min-height:64px;
+  padding:var(--sp-16);border:1px dashed var(--line-strong);border-radius:14px;
+  background:var(--surface-2);cursor:pointer;width:100%;
+  transition:border-color .14s ease,background .14s ease}
+.f-attach:hover{border-color:var(--accent-btn);background:var(--accent-soft)}
+.f-attach .ic{flex:none}
+.f-attach-t{display:grid;gap:var(--sp-4);min-width:0}
+.f-attach-t b{font-weight:600;font-size:.95rem;line-height:1.3}
+.f-attach-t span{color:var(--f-ink-soft);font-size:.85rem;line-height:1.3}
+.field input.photo-drop:focus-visible ~ .f-attach{outline:2px solid var(--focus);outline-offset:3px}
+
+/* ---- кнопка отправки ---- */
+.fsplit-card button[type=submit]{height:var(--m-btn-h);min-height:var(--m-btn-h)}
+.f-send{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-24);align-items:center}
+@media (max-width:640px){.f-send{grid-template-columns:1fr}.f-send .btn{width:100%}}
+
+/* ---- пороги: 1200 / 1024 / 881 / 320 ---- */
+/* Между 1200 и 1339 три дорожки рядом уже не держат карточку в 608:
+   замерено, сумма минимумов 1344 против доступных 1256 при 1280, и раздел
+   уезжал под overflow:hidden. Ниже 1340 мины уменьшены — карточка всё равно
+   набирает 640 и держит два столбца полей. */
+@media (max-width:1439px){
+  /* Полоса прокрутки ломает стык двух правил: медиазапрос и vw Chrome считает
+     по окну (1200), а раскладку — по клиентской ширине (1185). Замерено: при
+     1200 сумма минимумов выходила 1180 против доступных 1161, и правое поле
+     ужималось с 24 до 5. Поэтому минимумы здесь взяты с запасом на 17 px
+     полосы: 240 + 240 + 32 + 604 = 1116 при доступных 1161.
+     Верхняя граница полосы — 1439, а не 1399: широкое фото Шефа (30vw)
+     вместе с минимумами текста и карточки помещается только от 1427 px. */
+  /* Фото догоняет свои 30vw к верху полосы, а не прыгает на 144 px разом.
+     Потолок ставит сумма минимумов: фото ≤ ширина − 967, где 967 — это
+     полоса прокрутки 15, правое поле 24, колонка текста 292, зазор 32
+     и карточка 604. Отсюда 60vw − 487: 233 при 1200 и 376 при 1439.
+     Минимум колонки текста 292, а не 260: 32 из них съедает её отступ
+     слева, и видимая строка остаётся не уже 260 px. */
+  .fsplit{--m-photo:clamp(233px,calc(60vw - 487px),472px);--m-copy-min:292px;--m-copy-max:380px;
+    /* 604 — два столбца по 260, зазор 16, поля 64 и 4 px на дробные пиксели.
+       Ровно 600 давало 534 px содержимого при нужных 536, и поля срывались
+       в один столбец. */
+    --m-card-min:604px;--m-card-max:min(52vw,700px)}
+}
+@media (max-width:1199px){
+  /* Три дорожки в ряд здесь уже не дают карточке 604 px: 1009 − 24 поля
+     минус фото и текст оставляют ей 480. Поэтому текст переезжает НАД
+     карточкой, а фото занимает обе строки — карточка получает 780 px и
+     держит два столбца полей, как просил Шеф.
+     Липкой полосы здесь нет и быть не может: рядом с полосой карточке
+     осталось бы 456 px на 1024 — один столбец полей вместо двух-трёх.
+     Три обёртки растворяются display:contents, и снимок с текстом снова
+     встают прямо в сетку раздела — вся прежняя раскладка работает как была. */
+  .fsplit-rail,.fsplit-pin,.fsplit-stick{display:contents}
+  .fsplit{grid-template-columns:var(--m-photo) minmax(0,1fr);
+    --m-photo:clamp(200px,20vw,260px)}
+  /* Полосы в экран здесь нет, но липким остаётся сам снимок — иначе он
+     снова растянется на всю высоту раздела и превратится в щель.
+     Потолок формы --m-photo-k остаётся из общего правила, трогать нельзя. */
+  .fsplit-photo{align-self:stretch;position:relative}
+  .fsplit-ph-pin{position:absolute;inset:0}
+  /* Высоту здесь НЕ переобъявляем: потолок формы стоит в общем правиле,
+     и своя строка height его бы стёрла — снимок снова стал бы щелью. */
+  .fsplit-photo picture{position:sticky;top:var(--hdr-h)}
+  .fsplit-photo{grid-column:1;grid-row:1/3}
+  .fsplit-copy{grid-column:2;grid-row:1;margin-left:var(--sp-32);
+    padding:var(--sp-40) 0 0;max-width:520px}   /* предел читаемости строки */
+  .fsplit-card{grid-column:2;grid-row:2;margin:var(--sp-24) 0 var(--sp-40) var(--sp-32)}
+}
+@media (max-width:1023px){
+  .fsplit{grid-template-columns:minmax(0,1fr);padding:0;gap:var(--sp-32)}
+  /* grid-row из полосы 1024–1199 здесь надо снять руками: иначе фото
+     остаётся на двух строках, текст встаёт в первую и ложится прямо
+     на снимок — замерено, верх фото и верх текста совпадали. */
+  .fsplit-photo,.fsplit-copy,.fsplit-card{grid-column:1;grid-row:auto}
+  /* На телефоне и планшете кадр — полоса сверху во всю ширину.
+     Маску снимаем совсем: растворять нечего, снимок и так идёт от края
+     до края, а вертикальный сход съел бы верх и низ полосы.
+     Первая строка высоты — запас: не поддержит браузер svh, всё объявление
+     с clamp отпадёт целиком, и полоса уйдёт в auto. Здесь var() нет,
+     поэтому обычный откат по каскаду работает. */
+  .fsplit-photo{align-self:auto;position:static;
+    height:240px;height:clamp(200px,26svh,280px);background:none}
+  .fsplit-ph-pin{position:static;height:100%}
+  /* Накладку снимаем совсем: растворять нечего, кадр идёт от края до края,
+     а вертикальный сход съел бы верх и низ полосы. */
+  .fsplit-photo picture{position:static;height:100%;min-height:0}
+  .fsplit-photo picture::after{content:none}
+  .fsplit-photo img{height:100%;min-height:0}
+  .fsplit-copy{margin:0 var(--sp-24);padding:0}
+  .fsplit-card{margin:0 var(--sp-24) var(--sp-40)}
+}
+@media (max-width:880px){
+  .fsplit{gap:var(--sp-24)}
+  /* Колонка ниже сжимает свой зазор до 16, поэтому добавка подписи растёт
+     до 16 — над подписью снова выходит 32, на ступень больше зазора выгод. */
+  .f-sign{margin-top:var(--sp-16)}
+  .fsplit-photo{height:260px;height:clamp(200px,30svh,300px)}
+  .fsplit-card{padding:var(--sp-24)}
+  .fsplit-copy{gap:var(--sp-16)}
+  .f-step:not([aria-current]) .f-stept{display:none}
+}
+@media (max-width:480px){
+  .fsplit-sec .chips,.fsplit-sec .seg{display:grid;grid-template-columns:minmax(0,1fr)}
+  /* Ниже 480 одной строкой уже нельзя. Самый длинный ответ — «Готовы работать
+     в регионах Армении» — просит 302 px, а внутри карточки на 320 остаётся
+     241 (на 360 — 281). Замерено: без переноса кнопка вылезала из карточки
+     на 62 px и упиралась в край экрана, и раздел резал её по себе.
+     Перенос включаем ТОЛЬКО здесь: от 480 и выше вид прежний, одна строка.
+     Высота 44 остаётся нижним пределом, вертикальное поле обязательно —
+     иначе ответ в две строки упирается в рамку (правило 17). */
+  .fsplit-sec .chip,.fsplit-sec .seg-btn{
+    white-space:normal;height:auto;padding:var(--sp-8) var(--sp-16);text-align:center}
+}
+@media (max-width:380px){
+  .fsplit-copy{margin:0 var(--sp-16)}
+  .fsplit-card{margin:0 var(--sp-16) var(--sp-32);padding:var(--sp-16)}
+  .f-benefit{grid-template-columns:40px minmax(0,1fr);gap:var(--sp-12)}
+  .f-bico{width:40px;height:40px}
+}
 
 /* честная строка под кнопкой: что будет дальше */
 .form-note{font-size:.82rem;color:var(--ink-3);margin:0}
