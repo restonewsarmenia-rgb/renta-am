@@ -1,3 +1,8 @@
 # The pages.dev copy is closed to search engines. renta.am is not matched.
 https://:project.pages.dev/*
   X-Robots-Tag: noindex
+
+# Own fonts (G38): the address changes with the file's own content
+# (?v=hash in core.py), so a year-long cache never serves a stale font.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
