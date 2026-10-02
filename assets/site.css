@@ -1362,6 +1362,8 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 .svcs-rel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);
   border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 @media (max-width:760px){.svcs-rel{grid-template-columns:minmax(0,1fr)}}
+/* G39: the new pages under the home catalogue — the same cards as "Related services" */
+.svc-more{margin-top:32px;display:grid;gap:16px}
 /* .svc — строка списка внутри витрины, у неё нет боковых отступов: их даёт контейнер.
    Здесь строка сама становится карточкой, поэтому отступы нужны свои. */
 .svcs-rel .svc{background:var(--surface);padding:24px 26px;min-height:104px;align-content:center;

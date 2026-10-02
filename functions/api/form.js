@@ -28,9 +28,41 @@
  *
  * Отказоустойчиво: нет привязки LIMITS или D1 ответил ошибкой — заявка всё
  * равно уходит, как без счётчиков. Настоящую заявку терять нельзя никогда.
+ *
+ * ФИЛЬТР СПАМА — G39, 1 октября 2026. До любой доставки, обе формы.
+ * Жёсткий спам выбрасывается молча (ответ как при успехе, в Телеграм и на
+ * почту не уходит ничего):
+ *   · запрос без скрипта страницы (нет ft и нет pretty) И в нём ссылка в
+ *     свободном тексте, или маркер рекламы, или сообщение из одних цифр;
+ *   · два разных маркера рекламы где угодно;
+ *   · слово unsubscribe.
+ * Мягкий — ссылка из настоящего сеанса страницы (ft есть) без маркеров:
+ * доставляется, но первой строкой стоит «⚠ возможно спам».
+ * Поле email на ссылки не проверяется. Маркеры — одна константа ниже.
+ * Счётчик за сутки — в D1 (таблица spam_day): только число, без текста
+ * и без контактов.
+ *
+ * ЗАГОЛОВОК ПО-РУССКИ — G39. Шеф читает Телеграм по-русски, поэтому первая
+ * строка всегда «Renta — заявка с сайта: <услуга по-русски>» (поле svc),
+ * с пометкой «(английская страница)» для /en/. Язык браузера не ru/en/hy —
+ * отдельная строка «Язык браузера: …»: так видно, что страницу переводил
+ * браузер.
  */
 
-const SKIP = ["access_key", "botcheck", "from_name", "pretty", "photo", "ft"];
+const SKIP = ["access_key", "botcheck", "from_name", "pretty", "photo", "ft", "svc", "bl"];
+
+// ---- фильтр спама (G39) ----
+// Маркеры рекламных рассылок, без учёта регистра, по границе слова.
+// Считаются разные маркеры, а не повторы одного.
+export const SPAM_MARKERS = [
+  "seo", "google ads", "ad grants", "leads", "lead generation", "website owner",
+  "web visitors", "backlinks", "ranking", "traffic", "marketing agency",
+  "unsubscribe", "crypto", "casino", "loan",
+];
+// Служебные поля — не текст человека: в них спам не ищем.
+const TECH = ["access_key", "botcheck", "from_name", "subject", "page", "ft", "svc", "bl", "consent"];
+// Ссылка: http(s)://, www., голый домен (x.com, renta.am, site.io).
+const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9][a-z0-9-]{0,62}\.(com|net|org|io|co|info|biz|xyz|online|site|top|ru|am|uk|us|de|me|app|ly|link|club|pro|shop|store)\b)/i;
 const SAY = {
   ru: { ok: "Заявка принята. Мы свяжемся с вами.",
         no: "Не получилось отправить. Напишите на office@renta.am.",
@@ -109,6 +141,12 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
   const ft = Number(data.ft);
   if (Number.isFinite(ft) && ft >= 0 && ft < BOT_MS) return out(isJson, true, lang, 200);
 
+  // Фильтр спама (G39) — раньше проверки обязательных полей: рассылка часто
+  // приходит без телефона, и отказ 400 только подсказал бы ей, что поправить.
+  const spam = spamVerdict(data);
+  if (spam !== "clean") countSpam(env, spam, waitUntil);
+  if (spam === "hard") return out(isJson, true, lang, 200);
+
   const nm = String(data.name || "").trim();
   const tel = String(data.tel || "").trim();
   if (!nm || !tel) return out(isJson, false, lang, 400);
@@ -184,7 +222,7 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
   const [tg, mail] = isDryRun(env, request)
     ? [{ status: "fulfilled", value: true }, { status: "fulfilled", value: true }]
     : await Promise.allSettled([
-        toTelegram(env, buildText(data) + note, photo, nm),
+        toTelegram(env, (spam === "soft" ? "⚠ возможно спам\n" : "") + buildText(data) + note, photo, nm),
         toMail(env, data, lang, !!photo),
       ]);
   const okTg = tg.status === "fulfilled" && tg.value === true;
@@ -236,11 +274,56 @@ export function fromForm(fd) {
  *  здесь только запасной вариант — на случай отправки без скрипта.
  *  Экспортируется ради проверки, см. fromForm. */
 export function buildText(d) {
-  const head = String(d.subject || "Renta").trim();
-  const body = String(d.pretty || "").trim() || plain(d);
   const page = String(d.page || "").trim();
-  const t = head + "\n\n" + body + (page ? "\n\n" + page : "");
+  // Заголовок всегда по-русски (G39): «Renta — заявка с сайта: Няня для
+  // ребёнка (английская страница)». Тема письма (subject) на английской
+  // странице английская — она остаётся для почты, в Телеграм не идёт.
+  const svc = String(d.svc || "").trim();
+  const head = (isJobForm(d) ? "Renta — анкета соискателя" : "Renta — заявка с сайта") +
+    (svc ? ": " + svc : "") + (page.includes("/en/") ? " (английская страница)" : "");
+  const bl = String(d.bl || "").trim();
+  const blLine = bl && !/^(ru|en|hy)\b/i.test(bl) ? "\nЯзык браузера: " + bl.slice(0, 20) : "";
+  const body = String(d.pretty || "").trim() || plain(d);
+  const t = head + blLine + "\n\n" + body + (page ? "\n\n" + page : "");
   return t.length > 3900 ? t.slice(0, 3900) + "…" : t;
+}
+
+/** Вердикт фильтра спама: "hard" — выбросить молча, "soft" — доставить с
+ *  пометкой, "clean" — обычная заявка. Экспортируется ради проверки. */
+export function spamVerdict(d) {
+  const keys = Object.keys(d || {});
+  const free = keys.filter((k) => !TECH.includes(k) && k !== "pretty" && k !== "email");
+  const freeText = free.map((k) => String(d[k] ?? "")).join("\n");
+  // маркеры ищем везде, кроме служебных полей; pretty повторяет те же поля
+  const all = keys.filter((k) => !TECH.includes(k)).map((k) => String(d[k] ?? "")).join("\n");
+  const markers = SPAM_MARKERS.filter((m) => markerRe(m).test(all));
+  const link = LINK_RE.test(freeText);
+  const noScript = !String(d.ft ?? "").trim() && !String(d.pretty ?? "").trim();
+  const digitsOnly = /^[\d\s]+$/.test(String(d.msg ?? "").trim()) && String(d.msg ?? "").trim() !== "";
+  if (markers.includes("unsubscribe")) return "hard";
+  if (markers.length >= 2) return "hard";
+  if (noScript && (link || markers.length >= 1 || digitsOnly)) return "hard";
+  if (link) return "soft";
+  return "clean";
+}
+
+function markerRe(m) {
+  return new RegExp("(^|[^a-z0-9])" + m.replace(/ /g, "[\\s_-]+") + "($|[^a-z0-9])", "i");
+}
+
+/** Счётчик спама за сутки в D1 — только число. Сбой счётчика не мешает
+ *  ничему: заявка уже решена. */
+function countSpam(env, verdict, waitUntil) {
+  if (!env || !env.LIMITS) return;
+  const day = new Date().toISOString().slice(0, 10);
+  const col = verdict === "hard" ? "hard" : "soft";
+  const p = env.LIMITS
+    .prepare("INSERT INTO spam_day (day, hard, soft) VALUES (?, ?, ?) " +
+             "ON CONFLICT(day) DO UPDATE SET " + col + "=" + col + "+1")
+    .bind(day, col === "hard" ? 1 : 0, col === "soft" ? 1 : 0)
+    .run()
+    .catch(() => {});
+  if (typeof waitUntil === "function") waitUntil(p);
 }
 
 function plain(d) {
@@ -383,6 +466,9 @@ async function toMail(env, d, lang, hasPhoto) {
   const body = Object.assign({}, d, { access_key: env.W3F_KEY });
   delete body.botcheck;
   delete body.photo;
+  // служебные поля G39 — для Телеграма; письмо остаётся прежним
+  delete body.svc;
+  delete body.bl;
   if (hasPhoto) body[lang === "en" ? "Photo" : "Фото"] = SAY[lang].inTg;
   const r = await fetch("https://api.web3forms.com/submit", {
     method: "POST",
