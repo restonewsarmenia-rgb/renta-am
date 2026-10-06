@@ -1,5 +1,2 @@
 User-agent: *
-Allow: /
-Disallow: /proba/
-
-Sitemap: https://renta.am/sitemap.xml
+Disallow: /

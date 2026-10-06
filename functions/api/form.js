@@ -280,7 +280,7 @@ export function buildText(d) {
   // странице английская — она остаётся для почты, в Телеграм не идёт.
   const svc = String(d.svc || "").trim();
   const head = (isJobForm(d) ? "Renta — анкета соискателя" : "Renta — заявка с сайта") +
-    (svc ? ": " + svc : "") + (page.includes("/en/") ? " (английская страница)" : "");
+    (svc ? ": " + svc : "") + (page.includes("/en/") ? " (английская страница)" : page.includes("/hy/") ? " (армянская страница)" : "");
   const bl = String(d.bl || "").trim();
   const blLine = bl && !/^(ru|en|hy)\b/i.test(bl) ? "\nЯзык браузера: " + bl.slice(0, 20) : "";
   const body = String(d.pretty || "").trim() || plain(d);
