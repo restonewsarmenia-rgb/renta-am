@@ -1511,3 +1511,7 @@ form{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line
 /* HY: no free Armenian handwriting face exists - the signature is Noto Serif
    Armenian (under the Caveat family name), slanted by the browser */
 :lang(hy) .f-sign-svg text{font-style:italic}
+/* HY: small capital labels read badly in Armenian capitals (Шеф, 2026-10-06):
+   normal letters and light tracking, on Armenian pages only */
+:lang(hy) :is(.eyebrow,.f-eyebrow,.done-lbl,.mob-h,.ftr-h,.tbl-cap,.tbl th,.field > label,
+  .fgroup-h,.lbl,.tariff-h){text-transform:none;letter-spacing:.02em}
