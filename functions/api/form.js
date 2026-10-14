@@ -49,7 +49,7 @@
  * браузер.
  */
 
-const SKIP = ["access_key", "botcheck", "from_name", "pretty", "photo", "ft", "svc", "bl"];
+const SKIP = ["access_key", "botcheck", "from_name", "pretty", "photo", "ft", "svc", "bl", "cc", "ccbad"];
 
 // ---- фильтр спама (G39) ----
 // Маркеры рекламных рассылок, без учёта регистра, по границе слова.
@@ -60,7 +60,7 @@ export const SPAM_MARKERS = [
   "unsubscribe", "crypto", "casino", "loan",
 ];
 // Служебные поля — не текст человека: в них спам не ищем.
-const TECH = ["access_key", "botcheck", "from_name", "subject", "page", "ft", "svc", "bl", "consent"];
+const TECH = ["access_key", "botcheck", "from_name", "subject", "page", "ft", "svc", "bl", "consent", "cc"];
 // Ссылка: http(s)://, www., голый домен (x.com, renta.am, site.io).
 const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9][a-z0-9-]{0,62}\.(com|net|org|io|co|info|biz|xyz|online|site|top|ru|am|uk|us|de|me|app|ly|link|club|pro|shop|store)\b)/i;
 const SAY = {
@@ -148,8 +148,11 @@ export const onRequestPost = async ({ request, env, waitUntil }) => {
   if (spam === "hard") return out(isJson, true, lang, 200);
 
   const nm = String(data.name || "").trim();
-  const tel = String(data.tel || "").trim();
-  if (!nm || !tel) return out(isJson, false, lang, 400);
+  const rawTel = String(data.tel || "").trim();
+  if (!nm || !rawTel) return out(isJson, false, lang, 400);
+  // Код страны (поле cc) + номер. Нет кода или он кривой — +374, как раньше.
+  const tel = joinPhone(data);
+  data.tel = tel;
 
   const kind = isJobForm(data) ? "cand" : "client";
 
@@ -283,7 +286,8 @@ export function buildText(d) {
     (svc ? ": " + svc : "") + (page.includes("/en/") ? " (английская страница)" : "");
   const bl = String(d.bl || "").trim();
   const blLine = bl && !/^(ru|en|hy)\b/i.test(bl) ? "\nЯзык браузера: " + bl.slice(0, 20) : "";
-  const body = String(d.pretty || "").trim() || plain(d);
+  const ccLine = d.ccbad ? "\nКод страны введён неверно: " + d.ccbad : "";
+  const body = (String(d.pretty || "").trim() || plain(d)) + ccLine;
   const t = head + blLine + "\n\n" + body + (page ? "\n\n" + page : "");
   return t.length > 3900 ? t.slice(0, 3900) + "…" : t;
 }
@@ -341,6 +345,23 @@ function plain(d) {
 export function isJobForm(d) {
   const s = String(d.subject || "");
   return s.indexOf("анкета соискателя") !== -1 || s.indexOf("candidate application") !== -1;
+}
+
+/** Код страны + номер. cc нет или пуст — +374. Не «+ и 1–4 цифры» — тоже +374,
+ *  а в data.ccbad остаётся введённое значение (строка в Телеграм, заявку
+ *  не отклоняем). Номер, уже начинающийся с «+», идёт как есть.
+ *  Экспортируется ради проверки. */
+export function joinPhone(d) {
+  const num = String(d.tel || "").trim();
+  delete d.ccbad;
+  if (num.charAt(0) === "+") return num;
+  let cc = String(d.cc ?? "").trim();
+  if (!cc) cc = "+374";
+  else if (!/^\+?\d{1,4}$/.test(cc)) {
+    d.ccbad = cc.slice(0, 12);
+    cc = "+374";
+  } else if (cc.charAt(0) !== "+") cc = "+" + cc;
+  return cc + " " + num;
 }
 
 function normPhone(s) {
@@ -469,6 +490,8 @@ async function toMail(env, d, lang, hasPhoto) {
   // служебные поля G39 — для Телеграма; письмо остаётся прежним
   delete body.svc;
   delete body.bl;
+  delete body.cc;
+  delete body.ccbad;
   if (hasPhoto) body[lang === "en" ? "Photo" : "Фото"] = SAY[lang].inTg;
   const r = await fetch("https://api.web3forms.com/submit", {
     method: "POST",

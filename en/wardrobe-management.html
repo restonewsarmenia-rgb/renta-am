@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/golos-text-latin.woff2?v=fa6befa2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/literata-latin.woff2?v=b9d9af3d" crossorigin>
 
-<link rel="stylesheet" href="../assets/site.css?v=d62d11c0">
+<link rel="stylesheet" href="../assets/site.css?v=b91765fd">
 <style>.rowh{text-transform:none;font-size:.94rem;letter-spacing:0;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line)}</style>
 
 <a class="skip" href="#top">Skip to content</a>
@@ -248,7 +248,7 @@
       <div class="row2">
         <div class="field"><label for="name">Your name&nbsp;<span class="f-req" aria-hidden="true">*</span></label>
           <input id="name" name="name" type="text" data-q="Ваше имя" autocomplete="name" placeholder="How should we address you" required></div>
-        <div class="field"><label for="tel">Phone&nbsp;<span class="f-req" aria-hidden="true">*</span></label><div class="f-tel"><span class="f-tel-pre" aria-hidden="true">+374</span><input id="tel" name="tel" type="tel" autocomplete="tel" data-q="Телефон" inputmode="tel" placeholder="Phone number" required></div></div>
+        <div class="field"><label for="tel">Phone&nbsp;<span class="f-req" aria-hidden="true">*</span></label><div class="f-tel"><input class="f-tel-cc" id="cc" name="cc" type="tel" inputmode="tel" value="+374" autocomplete="tel-country-code" maxlength="5" pattern="\+?[0-9]{1,4}" aria-label="Country code" data-q="Код страны"><input id="tel" name="tel" type="tel" autocomplete="tel" data-q="Телефон" inputmode="tel" placeholder="Phone number" required></div></div>
       </div>
       <div class="row2">
         <div class="field"><label for="email">Email&nbsp;<span class="f-req" aria-hidden="true">*</span></label>
@@ -419,13 +419,13 @@ if(!document.getElementById('agree').checked){ say('Please tick the consent box.
 hush();
 var data={};
 new FormData(f).forEach(function(v,k){ data[k]=(k in data)?(data[k]+', '+v):v; });
-var telPre=f.querySelector('.f-tel-pre');
-telPre=telPre?telPre.textContent.trim():'';
-if(telPre&&data.tel&&data.tel.charAt(0)!=='+'){ data.tel=telPre+' '+data.tel; }
+var ccEl=f.querySelector('#cc'), telPre='';
+if(ccEl){ telPre=ccEl.value.trim(); if(!/^\+?[0-9]{1,4}$/.test(telPre)) telPre='+374';
+else if(telPre.charAt(0)!=='+') telPre='+'+telPre; }
 var seen={}, pretty=[];
 Array.prototype.forEach.call(f.elements,function(el){
 var n=el.name;
-if(!n||el.disabled||el.type==='hidden'||el.type==='submit') return;
+if(!n||n==='cc'||el.disabled||el.type==='hidden'||el.type==='submit') return;
 if((el.type==='checkbox'||el.type==='radio')&&!el.checked) return;
 var v;
 if(el.tagName==='SELECT'){ var so=el.selectedOptions&&el.selectedOptions[0];

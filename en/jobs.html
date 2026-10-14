@@ -27,7 +27,7 @@
 <body>
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/golos-text-latin.woff2?v=fa6befa2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/literata-latin.woff2?v=b9d9af3d" crossorigin>
-<link rel="stylesheet" href="../assets/site.css?v=d62d11c0">
+<link rel="stylesheet" href="../assets/site.css?v=b91765fd">
 
 <a class="skip" href="#top">Skip to content</a>
 <header class="hdr"><div class="wrap hdr-in">
@@ -418,13 +418,13 @@ var data={};
 new FormData(f).forEach(function(v,k){
 if(typeof File!=='undefined' && v instanceof File) return;
 data[k]=(k in data)?(data[k]+', '+v):v; });
-var telPre=f.querySelector('.f-tel-pre');
-telPre=telPre?telPre.textContent.trim():'';
-if(telPre&&data.tel&&data.tel.charAt(0)!=='+'){ data.tel=telPre+' '+data.tel; }
+var ccEl=f.querySelector('#cc'), telPre='';
+if(ccEl){ telPre=ccEl.value.trim(); if(!/^\+?[0-9]{1,4}$/.test(telPre)) telPre='+374';
+else if(telPre.charAt(0)!=='+') telPre='+'+telPre; }
 var seen={}, pretty=[];
 Array.prototype.forEach.call(f.elements,function(el){
 var n=el.name;
-if(!n||el.disabled||el.type==='hidden'||el.type==='submit') return;
+if(!n||n==='cc'||el.disabled||el.type==='hidden'||el.type==='submit') return;
 if(el.type==='file'){ if(photoBlob){ pretty.push('Фото: приложено'); } return; }
 if((el.type==='checkbox'||el.type==='radio')&&!el.checked) return;
 var v;
